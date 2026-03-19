@@ -1725,9 +1725,8 @@ function renderRentMgr() {
 
   var monthKey = _rmYear + "-" + (_rmMonth + 1);
 
-  // 이번 달 계약들 수집 (월세 있는 것만)
+  // 이번 달 계약들 수집 (계약이 있으면 모두 표시)
   var activeContracts = CONTRACTS.filter(function(c) {
-    if (!c.monthly) { return false; }
     if (c.start && new Date(c.start) > new Date(_rmYear, _rmMonth + 1, 0)) { return false; }
     if (c.end && new Date(c.end) < new Date(_rmYear, _rmMonth, 1)) { return false; }
     return true;
@@ -1784,7 +1783,7 @@ function renderRentMgr() {
     var contracts = propMap[pid];
     var prop = null;
     for (var pi=0; pi<PROPS.length; pi++) { if (PROPS[pi].id===pid) { prop=PROPS[pi]; break; } }
-    var propName = prop ? prop.name : "기타";
+    var propName = prop ? prop.name : "물건 미지정";
 
     // 물건 납부 현황 집계
     var pPaid = 0, pTotal = contracts.length;
