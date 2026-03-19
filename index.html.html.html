@@ -1,0 +1,2690 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="성환부동산">
+<meta name="theme-color" content="#007AFF">
+<title>성환부동산</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;background:#F2F2F7;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;color:#000;-webkit-text-size-adjust:100%;}
+#app{max-width:430px;margin:0 auto;height:100%;height:100dvh;display:flex;flex-direction:column;overflow:hidden;background:#F2F2F7;position:relative;}
+#hdr{background:#fff;border-bottom:0.5px solid rgba(0,0,0,.15);display:flex;align-items:center;justify-content:space-between;padding-left:16px;padding-right:16px;padding-bottom:12px;padding-top:calc(env(safe-area-inset-top,0px) + 14px);flex-shrink:0;}
+.hdr-title{font-size:17px;font-weight:600;letter-spacing:-.3px;}
+#btn-add{width:30px;height:30px;border-radius:50%;background:#E5F0FF;border:none;color:#007AFF;font-size:22px;line-height:1;cursor:pointer;display:none;align-items:center;justify-content:center;}
+#btn-back{display:none;align-items:center;gap:3px;background:transparent;border:none;color:#007AFF;font-size:15px;font-weight:500;cursor:pointer;padding:0;min-width:60px;}
+#btn-back svg{width:10px;height:16px;flex-shrink:0;}
+#scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 90px);}
+#scroll::-webkit-scrollbar{display:none;}
+#tabbar{background:#fff;border-top:0.5px solid rgba(0,0,0,.15);display:flex;align-items:flex-start;padding-top:6px;padding-bottom:env(safe-area-inset-bottom,0px);flex-shrink:0;position:sticky;bottom:0;z-index:100;}
+#tabbar::-webkit-scrollbar{display:none;}
+.ti{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:2px 4px 8px;min-width:0;}
+.ti-ic{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.ti-lb{font-size:13px;color:#8E8E93;}
+.ti.on .ti-ic{background:#007AFF;}
+.ti.on .ti-lb{color:#007AFF;font-weight:600;}
+.pnl{display:none;}.pnl.on{display:block;}
+.sec{padding:20px 16px 6px;font-size:12px;font-weight:600;color:#6C6C70;text-transform:uppercase;letter-spacing:.05em;}
+.mstrip{display:flex;gap:10px;padding:0 16px;overflow-x:auto;margin-bottom:8px;}
+.mstrip::-webkit-scrollbar{display:none;}
+.mc{background:#fff;border-radius:12px;padding:12px 14px;flex-shrink:0;min-width:100px;}
+.mc-l{font-size:11px;color:#8E8E93;margin-bottom:3px;}
+.mc-v{font-size:20px;font-weight:700;}
+.mc-s{font-size:11px;color:#8E8E93;margin-top:2px;}
+.lcard{background:#fff;border-radius:12px;margin:0 16px 12px;overflow:visible;}
+.lr{display:flex;align-items:center;padding:12px 16px;gap:12px;border-bottom:0.5px solid rgba(0,0,0,.1);}
+.lr:last-child{border-bottom:none;}
+.lic{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.lb{flex:1;min-width:0;}
+.lt{font-size:15px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ls{font-size:13px;color:#8E8E93;margin-top:2px;}
+.room-tag{font-size:11px;color:#007AFF;background:#E5F0FF;padding:2px 7px;border-radius:99px;display:inline-block;margin-top:4px;}
+.lv{text-align:right;flex-shrink:0;}
+.lv1{font-size:15px;font-weight:600;}
+.lv2{font-size:12px;color:#8E8E93;margin-top:3px;}
+.arow{display:flex;gap:8px;padding:8px 16px;border-bottom:0.5px solid rgba(0,0,0,.1);}
+.ae{flex:1;padding:9px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:#E5F0FF;color:#007AFF;}
+.ad{flex:1;padding:9px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:#FFEBEA;color:#FF3B30;}
+.dconf{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;background:#FFEBEA;border-bottom:0.5px solid rgba(0,0,0,.1);}
+.dconf-txt{font-size:13px;color:#C0392B;flex:1;}
+.dbtns{display:flex;gap:8px;flex-shrink:0;}
+.dcn{padding:7px 12px;border-radius:8px;border:none;background:rgba(0,0,0,.1);color:#333;font-size:13px;cursor:pointer;}
+.dok{padding:7px 12px;border-radius:8px;border:none;background:#FF3B30;color:#fff;font-size:13px;font-weight:600;cursor:pointer;}
+.bdg{display:inline-block;padding:3px 9px;border-radius:99px;font-size:12px;font-weight:500;}
+.bg{background:#E8F8EF;color:#1A7A40;}
+.bb{background:#E5F0FF;color:#0055CC;}
+.ba{background:#FFF4E0;color:#7A4D00;}
+.br{background:#FFEBEA;color:#B91C1C;}
+.bgr{background:#F0F0F0;color:#6C6C70;}
+.prog{background:#F0F0F0;border-radius:99px;height:5px;overflow:hidden;margin-top:6px;}
+.pf{height:100%;border-radius:99px;}
+.fc{background:#fff;border-radius:12px;margin:0 16px 12px;overflow:hidden;}
+.ff{padding:11px 16px;border-bottom:0.5px solid rgba(0,0,0,.1);}
+.ff:last-child{border-bottom:none;}
+.ff label{display:block;font-size:11px;font-weight:600;color:#8E8E93;margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em;}
+.ff input,.ff select{border:none;outline:none;font-size:16px;background:transparent;color:#000;font-family:inherit;width:100%;}
+.ff select{-webkit-appearance:none;appearance:none;}
+.ff .row2{display:flex;gap:12px;}
+.ff .row2 .col{flex:1;}
+.ff .row2 label{font-size:11px;font-weight:600;color:#8E8E93;margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em;display:block;}
+.chart-card{background:#fff;border-radius:12px;margin:0 16px 10px;overflow:hidden;}
+.chart-wrap{padding:14px 16px 10px;}
+.chart-title{font-size:12px;font-weight:600;color:#6C6C70;text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;}
+.chart-title span{font-size:11px;font-weight:400;color:#8E8E93;text-transform:none;letter-spacing:0;}
+.dual-bar-row{display:flex;align-items:flex-end;gap:3px;height:80px;margin-bottom:6px;}
+.dbar-group{flex:1;display:flex;align-items:flex-end;gap:1px;}
+.dbar{flex:1;border-radius:2px 2px 0 0;min-height:3px;}
+.dbar-lbl{width:100%;text-align:center;font-size:9px;color:#8E8E93;margin-top:3px;white-space:nowrap;}
+.chart-legend{display:flex;gap:12px;margin-bottom:8px;}
+.leg-item{display:flex;align-items:center;gap:4px;font-size:11px;color:#6C6C70;}
+.leg-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
+.chart-summary{display:flex;gap:0;border-top:0.5px solid rgba(0,0,0,.08);margin-top:8px;}
+.cs-item{flex:1;padding:10px 0;text-align:center;border-right:0.5px solid rgba(0,0,0,.08);}
+.cs-item:last-child{border-right:none;}
+.cs-lbl{font-size:10px;color:#8E8E93;margin-bottom:3px;}
+.cs-val{font-size:14px;font-weight:600;}
+.exp-row{display:flex;align-items:center;padding:11px 16px;border-bottom:0.5px solid rgba(0,0,0,.1);}
+.exp-row:last-child{border-bottom:none;}
+.exp-name{flex:1;font-size:14px;}
+.exp-amt{font-size:14px;font-weight:600;margin-right:8px;}
+.exp-amt.periodic{color:#FF9500;}
+.exp-amt.onetime{color:#8E8E93;}
+.exp-del{background:transparent;border:0.5px solid rgba(0,0,0,.12);border-radius:6px;color:#FF3B30;font-size:11px;padding:4px 8px;cursor:pointer;}
+.exp-badge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:99px;margin-right:6px;flex-shrink:0;}
+.exp-badge.periodic{background:#FFF4E0;color:#7A4D00;}
+.exp-badge.onetime{background:#F0F0F0;color:#6C6C70;}
+.exp-sec-hdr{padding:14px 16px 6px;font-size:11px;font-weight:600;color:#6C6C70;text-transform:uppercase;letter-spacing:.05em;}
+.an-prop-card{background:#fff;border-radius:12px;margin:0 16px 12px;overflow:hidden;}
+.an-prop-hdr{padding:12px 16px;background:#F8F8F8;border-bottom:0.5px solid rgba(0,0,0,.08);display:flex;justify-content:space-between;align-items:center;}
+.an-prop-name{font-size:15px;font-weight:600;}
+.an-occ{font-size:12px;font-weight:600;padding:3px 10px;border-radius:99px;}
+.an-occ.full{background:#E8F8EF;color:#1A7A40;}
+.an-occ.partial{background:#FFF4E0;color:#7A4D00;}
+.an-occ.empty{background:#FFEBEA;color:#B91C1C;}
+.an-compare{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;border-bottom:0.5px solid rgba(0,0,0,.08);}
+.an-col{padding:12px 14px;text-align:center;border-right:0.5px solid rgba(0,0,0,.08);}
+.an-col:last-child{border-right:none;}
+.an-col-lbl{font-size:10px;color:#8E8E93;margin-bottom:4px;font-weight:500;}
+.an-col-val{font-size:17px;font-weight:700;}
+.an-col-sub{font-size:10px;color:#8E8E93;margin-top:2px;}
+.an-diff-row{padding:10px 16px;display:flex;justify-content:space-between;align-items:center;font-size:13px;}
+.an-diff-bar-wrap{margin:0 16px 12px;height:8px;background:#F0F0F0;border-radius:99px;overflow:hidden;}
+.an-diff-bar{height:100%;border-radius:99px;transition:width .4s;}
+.rec-btn{width:calc(100% - 32px);margin:0 16px 8px;padding:13px;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;border:1.5px solid #007AFF;background:#fff;color:#007AFF;display:block;text-align:center;}
+.rec-row{display:flex;align-items:center;padding:11px 16px;border-bottom:0.5px solid rgba(0,0,0,.08);gap:10px;}
+.rec-row:last-child{border-bottom:none;}
+.rec-month{font-size:13px;font-weight:600;min-width:44px;}
+.rec-bar-wrap{flex:1;height:6px;background:#F0F0F0;border-radius:99px;overflow:hidden;}
+.rec-bar{height:100%;border-radius:99px;}
+.rec-amt{font-size:13px;font-weight:600;min-width:60px;text-align:right;}
+.rec-del{background:transparent;border:0.5px solid rgba(0,0,0,.12);border-radius:6px;color:#FF3B30;font-size:11px;padding:3px 7px;cursor:pointer;}
+.rm-prop-card{background:#fff;border-radius:14px;margin:0 16px 14px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.07);}
+.rm-prop-hdr{padding:13px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid rgba(0,0,0,.08);}
+.rm-prop-title{font-size:16px;font-weight:700;}
+.rm-prop-stat{font-size:12px;font-weight:600;padding:3px 10px;border-radius:99px;}
+.rm-prop-stat.all-paid{background:#E8F8EF;color:#1A7A40;}
+.rm-prop-stat.partial{background:#FFF4E0;color:#7A4D00;}
+.rm-prop-stat.none-paid{background:#FFEBEA;color:#B91C1C;}
+.rm-tenant-row{display:flex;align-items:center;padding:11px 16px;border-bottom:0.5px solid rgba(0,0,0,.06);gap:10px;}
+.rm-tenant-row:last-child{border-bottom:none;}
+.rm-tenant-name{flex:1;font-size:14px;font-weight:500;}
+.rm-tenant-amt{font-size:13px;color:#8E8E93;min-width:44px;text-align:right;}
+.rm-amt-input{font-size:13px;color:#007AFF;font-weight:600;min-width:54px;max-width:70px;border:none;border-bottom:1.5px solid #007AFF;text-align:right;background:transparent;outline:none;padding:1px 2px;}
+.rm-pay-btn{padding:6px 14px;border-radius:8px;border:none;font-size:12px;font-weight:700;cursor:pointer;}
+.rm-pay-btn.s-none{background:#F2F2F7;color:#AEAEB2;}
+.rm-pay-btn.s-paid{background:#E8F8EF;color:#1A7A40;}
+.rm-pay-btn.s-early{background:#E5F0FF;color:#0055CC;}
+.rm-pay-btn.s-prepaid{background:#E8F8EF;color:#1A7A40;}
+.rm-pay-btn.s-unpaid{background:#FFEBEA;color:#B91C1C;}
+.rm-month-nav{display:flex;align-items:center;justify-content:space-between;padding:10px 16px 4px;}
+.rm-month-label{font-size:15px;font-weight:700;color:#007AFF;}
+.rm-nav-btn{background:transparent;border:0.5px solid rgba(0,122,255,.4);border-radius:8px;padding:4px 12px;font-size:13px;color:#007AFF;cursor:pointer;}
+.rm-summary-bar{display:flex;gap:0;padding:10px 16px;margin:0 16px 10px;background:#F8F8F8;border-radius:10px;}
+.rm-sum-item{flex:1;text-align:center;}
+.rm-sum-lbl{font-size:10px;color:#8E8E93;margin-bottom:2px;}
+.rm-sum-val{font-size:15px;font-weight:700;}
+.phone-btn{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#007AFF;font-weight:500;text-decoration:none;background:#E5F0FF;padding:3px 10px;border-radius:99px;margin-top:3px;}
+.pay-strip{display:flex;gap:3px;padding:8px 16px;border-top:0.5px solid rgba(0,0,0,.06);flex-wrap:wrap;}
+.pay-cell{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;cursor:pointer;border:1px solid transparent;}
+.pay-cell.paid{background:#E8F8EF;color:#1A7A40;border-color:#B7E6C8;}
+.pay-cell.unpaid{background:#FFEBEA;color:#B91C1C;border-color:#F5C0BC;}
+.pay-cell.none{background:#F2F2F7;color:#AEAEB2;border-color:#E0E0E0;}
+.memo-row{padding:8px 16px 10px;border-top:0.5px solid rgba(0,0,0,.06);}
+.memo-text{font-size:12px;color:#6C6C70;line-height:1.5;white-space:pre-wrap;}
+.memo-empty{font-size:12px;color:#AEAEB2;}
+.due-banner{padding:8px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.due-banner.due-soon{background:#FFF4E0;border-top:0.5px solid rgba(255,149,0,.2);}
+.due-banner.overdue{background:#FFEBEA;border-top:0.5px solid rgba(255,59,48,.2);}
+.due-banner.ok{background:#E8F8EF;border-top:0.5px solid rgba(52,199,89,.2);}
+.due-txt{font-size:12px;font-weight:600;}
+.due-banner.due-soon .due-txt{color:#7A4D00;}
+.due-banner.overdue .due-txt{color:#B91C1C;}
+.due-banner.ok .due-txt{color:#1A7A40;}
+.pay-hist-toggle{font-size:11px;background:transparent;border:0.5px solid rgba(0,0,0,.15);border-radius:6px;padding:4px 10px;cursor:pointer;color:#6C6C70;}
+.pay-hist{display:none;border-top:0.5px solid rgba(0,0,0,.06);background:#fff;}
+.pay-hist.open{display:block;}
+.pay-hist-row{display:flex;align-items:center;padding:9px 16px;border-bottom:0.5px solid rgba(0,0,0,.05);gap:10px;}
+.pay-hist-row:last-child{border-bottom:none;}
+.pay-hist-date{font-size:13px;font-weight:500;min-width:80px;color:#333;}
+.pay-hist-status{flex:1;}
+.pay-hist-btn{font-size:11px;padding:4px 12px;border-radius:6px;border:none;cursor:pointer;font-weight:600;}
+.pay-hist-btn.to-paid{background:#E8F8EF;color:#1A7A40;}
+.pay-hist-btn.to-unpaid{background:#FFEBEA;color:#B91C1C;}
+.pay-hist-btn.to-none{background:#F2F2F7;color:#6C6C70;}
+.pay-hist-btn.to-early{background:#E5F0FF;color:#0055CC;}
+.pay-hist-btn.to-prepaid{background:#F0F0F0;color:#6C6C70;}
+.early-picker{background:#fff;border:1px solid rgba(0,122,255,.3);border-radius:12px;padding:10px 14px;margin:4px 0 0;box-shadow:0 4px 16px rgba(0,0,0,.12);}
+.early-picker-title{font-size:12px;color:#007AFF;font-weight:600;margin-bottom:8px;}
+.early-picker-months{display:flex;flex-wrap:wrap;gap:6px;}
+.ep-mon{padding:5px 10px;border-radius:8px;border:1.5px solid #007AFF;background:#fff;color:#007AFF;font-size:12px;font-weight:600;cursor:pointer;}
+.ep-mon.selected{background:#007AFF;color:#fff;}
+.ep-mon.already{border-color:#34C759;background:#E8F8EF;color:#1A7A40;cursor:default;}
+.ep-confirm{margin-top:8px;width:100%;padding:8px;border-radius:8px;border:none;background:#007AFF;color:#fff;font-size:13px;font-weight:600;cursor:pointer;}
+.interest-wrap{padding:14px 16px 10px;}
+.interest-title{font-size:11px;font-weight:600;color:#6C6C70;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;}
+.interest-row{display:flex;align-items:flex-end;gap:4px;height:60px;margin-bottom:6px;}
+.ibar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.ibar{width:100%;border-radius:3px 3px 0 0;min-height:4px;transition:height .3s;}
+.ibar-lbl{font-size:9px;color:#8E8E93;white-space:nowrap;}
+.interest-summary{display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:0.5px solid rgba(0,0,0,.08);}
+.is-item{text-align:center;}
+.is-lbl{font-size:10px;color:#8E8E93;margin-bottom:2px;}
+.is-val{font-size:14px;font-weight:600;}
+.room-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px 16px;background:#F2F6FF;border-top:0.5px solid rgba(0,122,255,.15);}
+.room-cell{border-radius:10px;padding:10px 6px;text-align:center;cursor:pointer;border:1.5px solid transparent;transition:none;}
+.room-cell.vacant{background:#fff;border-color:#007AFF;}
+.room-cell.vacant:active{background:#E5F0FF;}
+.room-cell.vacant.selected{background:#007AFF;border-color:#007AFF;}
+.room-cell.occupied{background:#F0F0F0;border-color:#E0E0E0;cursor:default;}
+.room-cell-num{font-size:14px;font-weight:600;}
+.room-cell.vacant .room-cell-num{color:#007AFF;}
+.room-cell.vacant.selected .room-cell-num{color:#fff;}
+.room-cell.occupied .room-cell-num{color:#AEAEB2;}
+.room-cell-status{font-size:10px;margin-top:3px;}
+.room-cell.vacant .room-cell-status{color:#34C759;}
+.room-cell.vacant.selected .room-cell-status{color:#E5F0FF;}
+.room-cell.occupied .room-cell-status{color:#AEAEB2;}
+.room-grid-hdr{padding:10px 16px 4px;font-size:11px;font-weight:600;color:#007AFF;text-transform:uppercase;letter-spacing:.05em;background:#F2F6FF;border-top:0.5px solid rgba(0,122,255,.15);}
+.room-section{background:#E5F0FF;border-radius:0;margin:0;padding:12px 16px;border-top:0.5px solid rgba(0,122,255,.2);}
+.room-section-title{font-size:13px;font-weight:600;color:#007AFF;margin-bottom:10px;}
+.room-config{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
+.room-config label{font-size:12px;color:#007AFF;font-weight:500;}
+.room-config input{width:48px;border:1px solid #007AFF;border-radius:6px;padding:4px 6px;font-size:14px;text-align:center;color:#003A8C;outline:none;}
+.room-config button{padding:6px 12px;border-radius:8px;border:none;background:#007AFF;color:#fff;font-size:12px;font-weight:600;cursor:pointer;}
+.room-build-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px;}
+.rb-cell{border-radius:8px;padding:8px 4px;text-align:center;cursor:pointer;border:1.5px solid #007AFF;background:#fff;transition:none;}
+.rb-cell.on{background:#007AFF;}
+.rb-cell.on span{color:#fff;}
+.rb-cell span{font-size:13px;font-weight:600;color:#007AFF;}
+.rb-cell.off-cell{border-color:#E0E0E0;background:#F8F8F8;cursor:pointer;}
+.rb-cell.off-cell span{color:#AEAEB2;}
+.room-counter{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.room-counter:last-child{margin-bottom:0;}
+.room-counter-label{font-size:16px;font-weight:500;color:#003A8C;}
+.room-counter-ctrl{display:flex;align-items:center;gap:14px;}
+.rc-btn{width:36px;height:36px;border-radius:50%;border:2px solid #007AFF;background:#fff;color:#007AFF;font-size:22px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:300;}
+.rc-val{font-size:22px;font-weight:700;color:#007AFF;min-width:32px;text-align:center;}
+.bfull{width:calc(100% - 32px);margin:0 16px 10px;padding:15px;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;border:none;display:block;text-align:center;}
+.bpri{background:#007AFF;color:#fff;}
+.bsec{background:#F0F0F0;color:#000;}
+.rc{background:#E5F0FF;border-radius:12px;padding:16px;margin:0 16px 10px;}
+.rl{font-size:12px;color:#007AFF;margin-bottom:4px;font-weight:500;}
+.rv{font-size:26px;font-weight:700;color:#003A8C;letter-spacing:-.5px;}
+.rsub{font-size:13px;color:#007AFF;margin-top:4px;}
+.rrow{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:0.5px solid rgba(0,0,0,.1);}
+.rrow:last-child{border-bottom:none;}
+.rk{font-size:14px;color:#6C6C70;}
+.rv2{font-size:14px;font-weight:500;}
+.seg{display:flex;background:rgba(120,120,128,.12);border-radius:9px;padding:2px;margin:0 16px 12px;}
+.si{flex:1;text-align:center;padding:7px 4px;font-size:13px;font-weight:500;border-radius:7px;cursor:pointer;color:#8E8E93;}
+.si.on{background:#fff;color:#000;}
+.emp{text-align:center;padding:48px 20px;}
+.emp-i{font-size:40px;margin-bottom:12px;}
+.emp p{font-size:14px;color:#8E8E93;line-height:1.6;}
+.sov{position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.4);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;}
+.sht{background:#F2F2F7;border-radius:16px 16px 0 0;max-height:92vh;display:flex;flex-direction:column;}
+.shdl{width:36px;height:5px;background:rgba(0,0,0,.2);border-radius:99px;margin:10px auto 4px;}
+.shhdr{display:flex;align-items:center;justify-content:space-between;padding:6px 16px 14px;}
+.shttl{font-size:18px;font-weight:700;}
+.shcls{padding:7px 14px;background:rgba(0,0,0,.08);border-radius:8px;border:none;font-size:15px;cursor:pointer;color:#000;}
+.shbdy{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:30px;}
+.shbdy::-webkit-scrollbar{display:none;}
+#install-tip{display:none;position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 76px);left:16px;right:16px;background:#1C1C1E;color:#fff;border-radius:14px;padding:14px 16px;z-index:300;box-shadow:0 4px 24px rgba(0,0,0,.3);}
+.tip-row{display:flex;align-items:center;gap:12px;}
+.tip-icon{font-size:26px;flex-shrink:0;}
+.tip-text{flex:1;}
+.tip-title{font-size:14px;font-weight:600;margin-bottom:3px;}
+.tip-desc{font-size:12px;opacity:.75;line-height:1.4;}
+.tip-close{background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;padding:6px 10px;font-size:13px;cursor:pointer;flex-shrink:0;}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div id="hdr">
+    <button id="btn-back">
+      <svg viewBox="0 0 10 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8.5 1L1.5 8L8.5 15" stroke="#007AFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span id="btn-back-label">뒤로</span>
+    </button>
+    <span class="hdr-title" id="ptitle">포트폴리오</span>
+    <button id="btn-add">+</button>
+  </div>
+
+  <div id="scroll">
+
+    <div class="pnl on" id="pnl-portfolio">
+      <div class="sec">자산 요약</div>
+      <div class="mstrip" id="d-met"></div>
+      <div id="d-cashchart" style="display:none;"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 16px 6px;">
+        <span style="font-size:12px;font-weight:600;color:#6C6C70;text-transform:uppercase;letter-spacing:.05em;">기타 지출</span>
+        <div style="display:flex;gap:6px;">
+          <button id="btn-add-exp" data-exptype="periodic" style="font-size:12px;background:#FFF4E0;color:#7A4D00;border:none;border-radius:8px;padding:5px 10px;font-weight:600;cursor:pointer;">+ 정기</button>
+          <button id="btn-add-exp-once" data-exptype="onetime" style="font-size:12px;background:#F0F0F0;color:#444;border:none;border-radius:8px;padding:5px 10px;font-weight:600;cursor:pointer;">+ 일회성</button>
+        </div>
+      </div>
+      <div id="exp-list"></div>
+      <div class="sec">보유 물건</div>
+      <div id="plist"></div>
+      <div class="sec">수익률</div>
+      <div class="lcard"><div style="padding:14px 16px;" id="ybars"></div></div>
+    </div>
+
+    <div class="pnl" id="pnl-contract">
+      <div class="sec">임대차 계약</div>
+      <div id="clist"></div>
+    </div>
+
+    <div class="pnl" id="pnl-auction">
+      <div class="sec">물건 정보</div>
+      <div class="fc">
+        <div class="ff"><label>감정가 (만원)</label><input id="a-ap" type="number" inputmode="numeric" value="50000"></div>
+        <div class="ff"><label>최저입찰가 (만원)</label><input id="a-mn" type="number" inputmode="numeric" value="35000"></div>
+        <div class="ff"><label>유찰 횟수</label><select id="a-fl"><option value="0">0회</option><option value="1">1회</option><option value="2" selected>2회</option><option value="3">3회</option><option value="4">4회</option></select></div>
+        <div class="ff"><label>지역</label><select id="a-rg"><option>서울 강남권</option><option>서울 기타</option><option>수도권</option><option>지방 광역시</option><option>기타</option></select></div>
+      </div>
+      <button class="bfull bpri" id="btn-auction">낙찰가 분석</button>
+      <div id="ares"></div>
+      <div class="sec">유찰 횟수별 평균</div>
+      <div class="lcard">
+        <div class="rrow"><span class="rk">0회</span><span class="rv2">98%</span></div>
+        <div class="rrow"><span class="rk">1회</span><span class="rv2">89%</span></div>
+        <div class="rrow"><span class="rk">2회</span><span class="rv2" style="color:#007AFF;">82%</span></div>
+        <div class="rrow"><span class="rk">3회+</span><span class="rv2">74%</span></div>
+      </div>
+    </div>
+
+    <div class="pnl" id="pnl-calc">
+      <div class="sec">계산 종류</div>
+      <div class="seg" id="cseg">
+        <div class="si on" data-target="cc-rent">임대료</div>
+        <div class="si" data-target="cc-loan">대출</div>
+        <div class="si" data-target="cc-tax">세금</div>
+      </div>
+      <div id="cc-rent">
+        <div class="fc">
+          <div class="ff"><label>종류</label><select id="r-tp"><option>아파트</option><option>빌라/다세대</option><option>오피스텔</option><option>다가구원룸</option><option>상가</option></select></div>
+          <div class="ff"><label>면적 (㎡)</label><input id="r-ar" type="number" inputmode="numeric" value="59"></div>
+          <div class="ff"><label>시세 (만원)</label><input id="r-pr" type="number" inputmode="numeric" value="50000"></div>
+          <div class="ff"><label>보증금 (만원)</label><input id="r-dp" type="number" inputmode="numeric" value="5000"></div>
+          <div class="ff"><label>지역</label><select id="r-rg"><option>서울 강남권</option><option>서울 기타</option><option>수도권</option><option>지방 광역시</option></select></div>
+        </div>
+        <button class="bfull bpri" id="btn-rent">계산하기</button>
+        <div id="rres"></div>
+      </div>
+      <div id="cc-loan" style="display:none;">
+        <div class="fc">
+          <div class="ff"><label>대출금액 (만원)</label><input id="l-am" type="number" inputmode="numeric" value="20000"></div>
+          <div class="ff"><label>연이율 (%)</label><input id="l-rt" type="number" inputmode="decimal" step="0.1" value="4.5"></div>
+          <div class="ff"><label>기간 (년)</label><input id="l-yr" type="number" inputmode="numeric" value="20"></div>
+          <div class="ff"><label>상환 방식</label><select id="l-mt"><option value="equal">원리금균등</option><option value="principal">원금균등</option><option value="bullet">만기일시</option></select></div>
+        </div>
+        <button class="bfull bpri" id="btn-loan">계산하기</button>
+        <div id="lres"></div>
+      </div>
+      <div id="cc-tax" style="display:none;">
+        <div class="seg" id="tseg">
+          <div class="si on" data-target="tc-acq">취득세</div>
+          <div class="si" data-target="tc-trf">양도세</div>
+          <div class="si" data-target="tc-inc">임대소득세</div>
+        </div>
+        <div id="tc-acq">
+          <div class="fc">
+            <div class="ff"><label>취득가액 (만원)</label><input id="tx-p" type="number" inputmode="numeric" value="50000"></div>
+            <div class="ff"><label>취득 후 주택 수</label><select id="tx-h"><option value="1">1주택</option><option value="2">2주택</option><option value="3" selected>3주택</option><option value="4">4주택+</option></select></div>
+            <div class="ff"><label>조정대상지역</label><select id="tx-a"><option value="y">조정대상지역</option><option value="n">비조정</option></select></div>
+          </div>
+          <button class="bfull bpri" id="btn-tax">계산하기</button>
+          <div id="txres"></div>
+        </div>
+        <div id="tc-trf" style="display:none;">
+          <div class="fc">
+            <div class="ff"><label>취득가액 (만원)</label><input id="tr-b" type="number" inputmode="numeric" value="30000"></div>
+            <div class="ff"><label>양도가액 (만원)</label><input id="tr-s" type="number" inputmode="numeric" value="50000"></div>
+            <div class="ff"><label>필요경비 (만원)</label><input id="tr-c" type="number" inputmode="numeric" value="500"></div>
+            <div class="ff"><label>보유 기간</label><select id="tr-h"><option value="1">1년 미만</option><option value="2">1~2년</option><option value="5">2~5년</option><option value="10" selected>5~10년</option><option value="99">10년+</option></select></div>
+            <div class="ff"><label>주택 수</label><select id="tr-n"><option value="1" selected>1주택 비과세</option><option value="2">2주택</option><option value="3">3주택+</option></select></div>
+          </div>
+          <button class="bfull bpri" id="btn-transfer">계산하기</button>
+          <div id="trres"></div>
+        </div>
+        <div id="tc-inc" style="display:none;">
+          <div class="fc">
+            <div class="ff"><label>연간 임대수입 (만원)</label><input id="in-r" type="number" inputmode="numeric" value="2400"></div>
+            <div class="ff"><label>과세 방식</label><select id="in-m"><option value="sep">분리과세 (14%)</option><option value="comp">종합과세</option></select></div>
+            <div class="ff"><label>타 소득 (만원/연)</label><input id="in-o" type="number" inputmode="numeric" value="4000"></div>
+          </div>
+          <button class="bfull bpri" id="btn-income">계산하기</button>
+          <div id="inres"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pnl" id="pnl-cashflow">
+      <div class="sec">이번 달 요약</div>
+      <div class="mstrip" id="cf-met"></div>
+      <div class="sec">물건별 수입</div>
+      <div class="lcard" id="cf-items"></div>
+      <div class="sec">연간 현황</div>
+      <div class="lcard" id="cf-ann"></div>
+    </div>
+
+    <!-- 연간 수익 분석 탭 -->
+    <div class="pnl" id="pnl-annual">
+      <div class="sec">연간 수익 분석</div>
+      <div class="mstrip" id="an-met"></div>
+      <div id="an-record-wrap"></div>
+      <div class="sec">물건별 분석</div>
+      <div id="an-props"></div>
+      <div class="sec">월별 기록</div>
+      <div id="an-monthly"></div>
+    </div>
+
+  </div>
+
+    <!-- 월세관리 탭 -->
+    <div class="pnl" id="pnl-rentmgr">
+      <div id="rm-month-nav" class="rm-month-nav"></div>
+      <div id="rm-summary" class="rm-summary-bar"></div>
+      <div id="rm-list"></div>
+    </div>
+
+  </div>
+
+  <div id="tabbar">
+    <div class="ti on" data-tab="portfolio"><div class="ti-ic"><span style="color:#fff;">▦</span></div><span class="ti-lb">포트폴리오</span></div>
+    <div class="ti" data-tab="contract"><div class="ti-ic"><span>◉</span></div><span class="ti-lb">임대계약</span></div>
+    <div class="ti" data-tab="rentmgr"><div class="ti-ic"><span>💰</span></div><span class="ti-lb">월세관리</span></div>
+    <div class="ti" data-tab="annual"><div class="ti-ic"><span>📊</span></div><span class="ti-lb">수익분석</span></div>
+    <div class="ti" data-tab="cashflow"><div class="ti-ic"><span>≋</span></div><span class="ti-lb">수익현황</span></div>
+  </div>
+
+  <div id="sov" class="sov" style="display:none;">
+    <div class="sht">
+      <div class="shdl"></div>
+      <div class="shhdr">
+        <span class="shttl" id="shttl"></span>
+        <button class="shcls" id="btn-shclose">닫기</button>
+      </div>
+      <div class="shbdy" id="shbdy"></div>
+    </div>
+  </div>
+
+  <div id="install-tip">
+    <div class="tip-row">
+      <div class="tip-icon">📲</div>
+      <div class="tip-text">
+        <div class="tip-title">성환부동산 앱 설치</div>
+        <div class="tip-desc">하단 공유 버튼 → "홈 화면에 추가"</div>
+      </div>
+      <button class="tip-close" id="btn-tip-close">✕</button>
+    </div>
+  </div>
+
+</div>
+<script>
+// ── DATA ──────────────────────────────────────────────────────────
+var PROPS = [];
+var CONTRACTS = [];
+var nextPid = 5, nextCid = 4, nextEid = 1;
+var EXPENSES = [];       // [{id, name, amount, memo, expType}]
+var MONTHLY_RECORDS = []; // [{id, year, month, income, note}]
+var nextRid = 1;
+var pendingDel = null;
+var curTab = "portfolio";
+var sheetType = null, sheetEditId = null;
+
+// ── UTILS ─────────────────────────────────────────────────────────
+function ge(id) { return document.getElementById(id); }
+function fmt(n) { return Math.round(n).toLocaleString("ko-KR"); }
+function pname(id) {
+  for (var i = 0; i < PROPS.length; i++) { if (PROPS[i].id === id) { return PROPS[i].name; } }
+  return "–";
+}
+function isMultiRoom(p) { return p.type === "다가구원룸"; }
+function propRooms(p) {
+  // 실제 호실 배열 반환
+  if (p.rooms && Array.isArray(p.rooms) && p.rooms.length > 0) { return p.rooms; }
+  // 구버전 호환
+  var arr = [];
+  if (p.totalRooms > 0) { for (var i = 1; i <= p.totalRooms; i++) { arr.push(String(i)); } }
+  return arr;
+}
+function totalRooms(p) { return propRooms(p).length; }
+function totalRent(p) {
+  if (isMultiRoom(p)) { return (p.rent || 0) * (p.rentedRooms || 0); }
+  return p.rent || 0;
+}
+function pyld(p) {
+  var mr = totalRent(p);
+  if (!p.price || !mr) { return 0; }
+  return parseFloat((mr * 12 / p.price * 100).toFixed(2));
+}
+function monthlyInterest(p) {
+  if (!p.loanAmt || !p.loanRate) { return 0; }
+  return Math.round(p.loanAmt * (p.loanRate / 100) / 12);
+}
+function netYield(p) {
+  // 이자 차감 후 / 매입가 기준 수익률
+  var mr = totalRent(p);
+  var interest = monthlyInterest(p);
+  var net = mr - interest;
+  if (!p.price || net <= 0) { return 0; }
+  return parseFloat((net * 12 / p.price * 100).toFixed(2));
+}
+function investYield(p) {
+  // 실제 투자금(매입가 - 대출금 - 보증금) 기준 수익률
+  var mr = totalRent(p);
+  if (!mr) { return 0; }
+  var invested = investedAmt(p);
+  if (invested <= 0) { return 0; }
+  // 순수입(이자 차감)으로 계산
+  var interest = monthlyInterest(p);
+  var netIncome = mr - interest;
+  if (netIncome <= 0) { return 0; }
+  return parseFloat((netIncome * 12 / invested * 100).toFixed(2));
+}
+function investedAmt(p) {
+  // 실제 투자금 = 매입가 − 대출금 − 보증금
+  return Math.max(0, (p.price || 0) - (p.loanAmt || 0) - (p.deposit || 0));
+}
+function investedBreakdown(p) {
+  // 계산식 문자열 반환
+  var parts = [fmt(p.price) + "만"];
+  if (p.loanAmt) { parts.push("대출 " + fmt(p.loanAmt) + "만"); }
+  if (p.deposit) { parts.push("보증금 " + fmt(p.deposit) + "만"); }
+  return parts.join(" − ");
+}
+function sbadge(s) {
+  if (s === "임대중") { return "bg"; }
+  if (s === "전세") { return "bb"; }
+  if (s === "공실") { return "ba"; }
+  return "bgr";
+}
+function semoji(t) {
+  if (t === "아파트") { return "🏢"; }
+  if (t === "빌라" || t === "빌라/다세대") { return "🏘"; }
+  if (t === "오피스텔") { return "🏬"; }
+  if (t === "상가") { return "🏪"; }
+  if (t === "다가구원룸") { return "🏠"; }
+  if (t === "토지") { return "🌿"; }
+  return "🏗";
+}
+function cstatus(end) {
+  if (!end) { return {l:"–", c:"bgr"}; }
+  var d = Math.floor((new Date(end) - new Date()) / 86400000);
+  if (d < 0) { return {l:"만료", c:"br"}; }
+  if (d < 60) { return {l:"만료임박", c:"br"}; }
+  return {l:"정상", c:"bg"};
+}
+var COLS = ["#007AFF","#34C759","#FF9500","#FF3B30","#AF52DE","#FF6B35"];
+var TAB_TITLES = {portfolio:"포트폴리오", contract:"임대차 계약", auction:"경매 분석", cashflow:"수익 현황", annual:"연간 수익 분석", rentmgr:"월세 관리"};
+var TAB_ADD = {portfolio:true, contract:true, auction:false, cashflow:false, annual:false, rentmgr:false};
+var PTYPES = ["아파트","빌라/다세대","오피스텔","다가구원룸","상가","토지","기타"];
+var PSTATUS = ["임대중","전세","공실","매각"];
+
+// ── STORAGE ───────────────────────────────────────────────────────
+function saveData() {
+  try {
+    var pStr = JSON.stringify(PROPS);
+    var cStr = JSON.stringify(CONTRACTS);
+    var eStr = JSON.stringify(EXPENSES);
+    var rStr = JSON.stringify(MONTHLY_RECORDS);
+    localStorage.setItem("bp_props",     pStr);
+    localStorage.setItem("bp_contracts", cStr);
+    localStorage.setItem("bp_expenses",  eStr);
+    localStorage.setItem("bp_records",   rStr);
+    localStorage.setItem("bp_pid",  String(nextPid));
+    localStorage.setItem("bp_cid",  String(nextCid));
+    localStorage.setItem("bp_eid",  String(nextEid));
+    localStorage.setItem("bp_rid",  String(nextRid));
+    // 저장 직후 검증: 읽어서 길이 확인
+    var verify = localStorage.getItem("bp_props");
+    if (!verify || verify.length < 2) {
+      throw new Error("save verify failed");
+    }
+  } catch(err) {
+    // 저장 실패 시 사용자에게 알림 (용량 초과 등)
+    if (err.name === "QuotaExceededError") {
+      alert("저장 공간이 부족합니다. 일부 데이터를 삭제해주세요.");
+    }
+  }
+}
+function periodicExpenses(propId) {
+  // 정기지출만 합산. propId 지정 시 해당 물건 귀속 + 공통만
+  var t = 0;
+  for (var i = 0; i < EXPENSES.length; i++) {
+    var e = EXPENSES[i];
+    if (e.expType === "onetime") { continue; }
+    if (propId !== undefined) {
+      // 해당 물건 귀속 또는 공통(propId=0)만
+      if (e.propId && e.propId !== propId) { continue; }
+    }
+    t += e.amount || 0;
+  }
+  return t;
+}
+function onetimeExpenses() {
+  // 일회성 지출 합산 → 참고용으로만 표시
+  var t = 0;
+  for (var i = 0; i < EXPENSES.length; i++) {
+    if (EXPENSES[i].expType === "onetime") { t += EXPENSES[i].amount || 0; }
+  }
+  return t;
+}
+function totalExpenses(propId) {
+  // 정기 + 일회성 모두 반영. propId 지정 시 해당 물건 귀속 + 공통만
+  return periodicExpenses(propId) + onetimeExpenses();
+}
+function loadData() {
+  try {
+    var p   = localStorage.getItem("bp_props");
+    var c   = localStorage.getItem("bp_contracts");
+    var e   = localStorage.getItem("bp_expenses");
+    var r   = localStorage.getItem("bp_records");
+    var pid = localStorage.getItem("bp_pid");
+    var cid = localStorage.getItem("bp_cid");
+    var eid = localStorage.getItem("bp_eid");
+    var rid = localStorage.getItem("bp_rid");
+    if (p && p !== "null" && p !== "undefined") {
+      var parsed = JSON.parse(p);
+      if (Array.isArray(parsed)) { PROPS = parsed; }
+    }
+    if (c && c !== "null" && c !== "undefined") {
+      var parsedC = JSON.parse(c);
+      if (Array.isArray(parsedC)) { CONTRACTS = parsedC; }
+    }
+    if (e && e !== "null" && e !== "undefined") {
+      var parsedE = JSON.parse(e);
+      if (Array.isArray(parsedE)) { EXPENSES = parsedE; }
+    }
+    if (r && r !== "null" && r !== "undefined") {
+      var parsedR = JSON.parse(r);
+      if (Array.isArray(parsedR)) { MONTHLY_RECORDS = parsedR; }
+    }
+    if (pid && !isNaN(parseInt(pid))) { nextPid = parseInt(pid); }
+    if (cid && !isNaN(parseInt(cid))) { nextCid = parseInt(cid); }
+    if (eid && !isNaN(parseInt(eid))) { nextEid = parseInt(eid); }
+    if (rid && !isNaN(parseInt(rid))) { nextRid = parseInt(rid); }
+    // migrate: contract 구버전 필드 보완
+    for (var ci = 0; ci < CONTRACTS.length; ci++) {
+      if (!CONTRACTS[ci].unit)     { CONTRACTS[ci].unit     = CONTRACTS[ci].tenant || ""; }
+      if (!CONTRACTS[ci].phone)    { CONTRACTS[ci].phone    = ""; }
+      if (!CONTRACTS[ci].memo)     { CONTRACTS[ci].memo     = ""; }
+      if (!CONTRACTS[ci].payments) { CONTRACTS[ci].payments = {}; }
+    }
+    // migrate: 구버전 데이터에 누락된 필드 추가
+    for (var i = 0; i < PROPS.length; i++) {
+      if (PROPS[i].totalRooms  === undefined) { PROPS[i].totalRooms  = 0; }
+      if (PROPS[i].rentedRooms === undefined) { PROPS[i].rentedRooms = 0; }
+      if (PROPS[i].loanAmt     === undefined) { PROPS[i].loanAmt     = 0; }
+      if (PROPS[i].loanRate    === undefined) { PROPS[i].loanRate    = 0; }
+      // rooms 배열 없으면 totalRooms 기반으로 생성 (단순 1~N 번호)
+      if (!PROPS[i].rooms || !Array.isArray(PROPS[i].rooms)) {
+        PROPS[i].rooms = [];
+        if (PROPS[i].type === "다가구원룸" && PROPS[i].totalRooms > 0) {
+          for (var ri = 1; ri <= PROPS[i].totalRooms; ri++) { PROPS[i].rooms.push(String(ri)); }
+        }
+      }
+    }
+  } catch(err) {
+    // localStorage 파싱 오류 → 기존 데이터 유지 (빈 배열)
+  }
+}
+
+// ── NAVIGATION ────────────────────────────────────────────────────
+var TAB_HISTORY = [];  // 탭 이동 히스토리 스택
+
+function updateBackBtn() {
+  var btn = ge("btn-back");
+  if (!btn) { return; }
+  if (TAB_HISTORY.length > 0) {
+    var prevTab = TAB_HISTORY[TAB_HISTORY.length - 1];
+    ge("btn-back-label").textContent = TAB_TITLES[prevTab] || "뒤로";
+    btn.style.display = "flex";
+    // 뒤로가기가 있으면 + 버튼 위치 유지를 위해 오른쪽 여백 확보
+    var addBtn = ge("btn-add");
+    if (addBtn.style.display === "none") {
+      addBtn.style.visibility = "hidden";
+      addBtn.style.display = "flex";
+    }
+  } else {
+    btn.style.display = "none";
+    ge("btn-back-label").textContent = "뒤로";
+  }
+}
+
+function goTab(id, pushHistory) {
+  // 히스토리 관리: tabbar 직접 클릭 시 히스토리 초기화, goTabFrom 호출 시 쌓기
+  if (pushHistory === true) {
+    TAB_HISTORY.push(curTab);
+    if (TAB_HISTORY.length > 10) { TAB_HISTORY.shift(); }
+  } else {
+    // 탭바 직접 클릭: 히스토리 초기화
+    TAB_HISTORY = [];
+  }
+
+  var allTabs = document.querySelectorAll(".ti");
+  for (var i = 0; i < allTabs.length; i++) {
+    allTabs[i].classList.remove("on");
+    var sp = allTabs[i].querySelector(".ti-ic span");
+    if (sp) { sp.style.color = ""; }
+  }
+  var activeTab = document.querySelector('.ti[data-tab="' + id + '"]');
+  if (activeTab) {
+    activeTab.classList.add("on");
+    var sp2 = activeTab.querySelector(".ti-ic span");
+    if (sp2) { sp2.style.color = "#fff"; }
+  }
+  var panels = document.querySelectorAll(".pnl");
+  for (var j = 0; j < panels.length; j++) { panels[j].classList.remove("on"); }
+  ge("pnl-" + id).classList.add("on");
+  ge("ptitle").textContent = TAB_TITLES[id] || id;
+  curTab = id;
+  pendingDel = null;
+
+  // + 버튼 visibility 초기화
+  var addBtn = ge("btn-add");
+  addBtn.style.visibility = "";
+  addBtn.style.display = TAB_ADD[id] ? "flex" : "none";
+
+  updateBackBtn();
+  ge("scroll").scrollTop = 0;
+  if (id === "portfolio") { renderPortfolio(); }
+  if (id === "contract") { renderContracts(); }
+  if (id === "cashflow") { renderCashflow(); }
+  if (id === "annual") { renderAnnual(); }
+  if (id === "rentmgr") { renderRentMgr(); }
+}
+
+function goBack() {
+  if (TAB_HISTORY.length === 0) { return; }
+  var prev = TAB_HISTORY.pop();
+  goTab(prev, false);
+  // 뒤로가기 후에도 남은 히스토리 표시
+  updateBackBtn();
+}
+
+// ── RENDER PORTFOLIO ──────────────────────────────────────────────
+function renderPortfolio() {
+  var tv = 0, tr = 0;
+  for (var i = 0; i < PROPS.length; i++) {
+    tv += PROPS[i].price;
+    tr += totalRent(PROPS[i]);
+  }
+  var rp = [];
+  for (var i = 0; i < PROPS.length; i++) {
+    if (totalRent(PROPS[i]) > 0) { rp.push(PROPS[i]); }
+  }
+  var ay = 0, anyld = 0, aiy = 0;
+  if (rp.length) {
+    var sum = 0, sumn = 0, sumi = 0;
+    for (var i = 0; i < rp.length; i++) {
+      sum  += pyld(rp[i]);
+      sumn += netYield(rp[i]);
+      var iy = investYield(rp[i]);
+      if (iy > 0) { sumi += iy; }
+    }
+    ay    = sum  / rp.length;
+    anyld = sumn / rp.length;
+    // 투자수익률은 대출 있는 물건만 평균
+    var loanProps = rp.filter(function(x){ return (x.loanAmt > 0 || x.deposit > 0) && investYield(x) > 0; });
+    aiy = loanProps.length ? loanProps.reduce(function(s,x){ return s + investYield(x); }, 0) / loanProps.length : 0;
+  }
+
+  var totalUnits = 0, rentedUnits = 0, totalMI = 0, totalInvested = 0, totalDeposit = 0;
+  for (var i = 0; i < PROPS.length; i++) {
+    if (isMultiRoom(PROPS[i])) {
+      totalUnits += PROPS[i].totalRooms || 0;
+      rentedUnits += PROPS[i].rentedRooms || 0;
+    }
+    totalMI += monthlyInterest(PROPS[i]);
+    totalInvested += investedAmt(PROPS[i]);
+    totalDeposit += PROPS[i].deposit || 0;
+  }
+
+  // 총 부채 = 대출금 합계
+  var totalLoanSum = 0;
+  for (var li = 0; li < PROPS.length; li++) { totalLoanSum += PROPS[li].loanAmt || 0; }
+  ge("d-met").innerHTML =
+    '<div class="mc"><div class="mc-l">총 자산</div><div class="mc-v">' + (tv/10000).toFixed(1) + '억</div><div class="mc-s">' + fmt(tv) + '만원</div></div>' +
+    '<div class="mc"><div class="mc-l">총 부채</div><div class="mc-v" style="color:#FF3B30;">' + (totalLoanSum >= 10000 ? (totalLoanSum/10000).toFixed(1)+'억' : fmt(totalLoanSum)+'만') + '</div><div class="mc-s">대출 합계</div></div>' +
+    '<div class="mc"><div class="mc-l">월 수입</div><div class="mc-v">' + fmt(tr) + '만</div><div class="mc-s">연 ' + fmt(tr*12) + '만원</div></div>' +
+    '<div class="mc"><div class="mc-l">월 이자지출</div><div class="mc-v" style="color:#FF3B30;">' + fmt(totalMI) + '만</div><div class="mc-s">연 ' + fmt(totalMI*12) + '만원</div></div>' +
+    '<div class="mc"><div class="mc-l">매입가 수익률</div><div class="mc-v">' + (ay ? ay.toFixed(1)+"%" : "–") + '</div><div class="mc-s">이자차감 ' + (anyld ? anyld.toFixed(1)+"%" : "–") + '</div></div>' +
+    '<div class="mc"><div class="mc-l">투자금 수익률</div><div class="mc-v" style="color:' + (aiy > ay ? "#007AFF" : "#000") + ';">' + (aiy ? aiy.toFixed(1)+"%" : "–") + '</div><div class="mc-s">투자금 ' + (totalInvested ? (totalInvested/10000).toFixed(1)+'억' : "–") + '</div></div>' +
+    '<div class="mc"><div class="mc-l">보증금 합계</div><div class="mc-v" style="color:#5856D6;">' + (totalDeposit >= 10000 ? (totalDeposit/10000).toFixed(1)+'억' : fmt(totalDeposit)+'만') + '</div><div class="mc-s">' + fmt(totalDeposit) + '만원</div></div>' +
+    '<div class="mc"><div class="mc-l">보유 물건</div><div class="mc-v">' + PROPS.length + '</div><div class="mc-s">' + (totalUnits ? '방 ' + rentedUnits + '/' + totalUnits + '호' : '임대 ' + rp.length + '건') + '</div></div>';
+
+  if (!PROPS.length) {
+    ge("plist").innerHTML = '<div class="emp"><div class="emp-i">🏠</div><p>오른쪽 위 <strong style="color:#007AFF;">+</strong> 버튼으로<br>첫 번째 물건을 추가하세요<br><span style="font-size:12px;color:#AEAEB2;margin-top:6px;display:block;">입력한 데이터는 이 기기에 자동 저장됩니다</span></p></div>';
+    ge("ybars").innerHTML = '<p style="font-size:13px;color:#8E8E93;text-align:center;padding:12px 0;">물건 추가 후 표시됩니다</p>';
+    ge("d-cashchart").style.display = "none";
+    renderExpenses();
+    return;
+  }
+
+  // ── 통합 월별 수입·지출 차트 ─────────────────────────────────────
+  var totalExp = totalExpenses();
+  var chartEl = ge("d-cashchart");
+  var MONTHS = ["1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월"];
+  var curMonth = new Date().getMonth();
+
+  // 월별 수입, 이자, 기타지출 (고정 기준 매월 동일)
+  var maxVal = Math.max(tr, totalMI + totalExp, 1);
+
+  var ch = '<div class="chart-card"><div class="chart-wrap">';
+  ch += '<div class="chart-title">월별 수입 · 지출<span>이번 달 강조</span></div>';
+  ch += '<div class="chart-legend">';
+  ch += '<div class="leg-item"><div class="leg-dot" style="background:#34C759;"></div>수입</div>';
+  ch += '<div class="leg-item"><div class="leg-dot" style="background:#FF3B30;"></div>대출이자</div>';
+  if (totalExp > 0) {
+    ch += '<div class="leg-item"><div class="leg-dot" style="background:#FF9500;"></div>기타지출</div>';
+  }
+  ch += '</div>';
+
+  ch += '<div class="dual-bar-row">';
+  for (var mi = 0; mi < 12; mi++) {
+    var isNow = (mi === curMonth);
+    var hIn  = tr     > 0 ? Math.max(3, Math.round(tr     / maxVal * 72)) : 3;
+    var hInt = totalMI > 0 ? Math.max(3, Math.round(totalMI / maxVal * 72)) : 0;
+    var hExp = totalExp > 0 ? Math.max(3, Math.round(totalExp / maxVal * 72)) : 0;
+    var alpha = isNow ? "ff" : "88";
+    ch += '<div style="flex:1;display:flex;flex-direction:column;align-items:center;">';
+    ch += '<div style="display:flex;align-items:flex-end;gap:1px;width:100%;">';
+    ch += '<div style="flex:1;height:' + hIn + 'px;background:#34C759' + alpha + ';border-radius:2px 2px 0 0;min-height:3px;"></div>';
+    if (hInt > 0) {
+      ch += '<div style="flex:1;display:flex;flex-direction:column;align-items:stretch;">';
+      ch += '<div style="height:' + hInt + 'px;background:#FF3B30' + alpha + ';border-radius:2px 2px 0 0;min-height:3px;"></div>';
+      if (hExp > 0) {
+        ch += '<div style="height:' + hExp + 'px;background:#FF9500' + alpha + ';min-height:3px;margin-top:1px;"></div>';
+      }
+      ch += '</div>';
+    } else if (hExp > 0) {
+      ch += '<div style="flex:1;height:' + hExp + 'px;background:#FF9500' + alpha + ';border-radius:2px 2px 0 0;min-height:3px;"></div>';
+    }
+    ch += '</div>';
+    ch += '<div style="font-size:9px;color:' + (isNow ? "#007AFF" : "#8E8E93") + ';margin-top:3px;' + (isNow ? "font-weight:700;" : "") + '">' + MONTHS[mi] + '</div>';
+    ch += '</div>';
+  }
+  ch += '</div>';
+
+  // 요약
+  var netMonthly = tr - totalMI - totalExp;
+  ch += '<div class="chart-summary">';
+  ch += '<div class="cs-item"><div class="cs-lbl">월 수입</div><div class="cs-val" style="color:#34C759;">+' + fmt(tr) + '만</div></div>';
+  ch += '<div class="cs-item"><div class="cs-lbl">월 지출</div><div class="cs-val" style="color:#FF3B30;">–' + fmt(totalMI + totalExp) + '만</div></div>';
+  ch += '<div class="cs-item"><div class="cs-lbl">월 순수익</div><div class="cs-val" style="color:' + (netMonthly >= 0 ? '#007AFF' : '#FF3B30') + ';">' + (netMonthly >= 0 ? '+' : '') + fmt(netMonthly) + '만</div></div>';
+  ch += '<div class="cs-item"><div class="cs-lbl">연 순수익</div><div class="cs-val" style="color:' + (netMonthly >= 0 ? '#007AFF' : '#FF3B30') + ';">' + (netMonthly >= 0 ? '+' : '') + fmt(netMonthly * 12) + '만</div></div>';
+  ch += '</div>';
+
+  // 지출 상세
+  if (totalMI > 0 || totalExp > 0) {
+    ch += '<div style="padding:8px 0 2px;border-top:0.5px solid rgba(0,0,0,.08);margin-top:2px;">';
+    var totalLoan2 = 0;
+    for (var pi = 0; pi < PROPS.length; pi++) {
+      totalLoan2 += PROPS[pi].loanAmt || 0;
+      var pmiD = monthlyInterest(PROPS[pi]);
+      if (pmiD > 0) {
+        ch += '<div style="display:flex;justify-content:space-between;font-size:12px;padding:3px 0;">';
+        ch += '<span style="color:#8E8E93;">└ ' + PROPS[pi].name + ' 이자 (' + PROPS[pi].loanRate + '%)</span>';
+        ch += '<span style="color:#FF3B30;font-weight:500;">–' + fmt(pmiD) + '만/월</span></div>';
+      }
+    }
+    for (var ei = 0; ei < EXPENSES.length; ei++) {
+      var isOnceE = EXPENSES[ei].expType === "onetime";
+      var expPropLabel = (isOnceE && EXPENSES[ei].propId) ? " [" + pname(EXPENSES[ei].propId) + "]" : "";
+      ch += '<div style="display:flex;justify-content:space-between;font-size:12px;padding:3px 0;">';
+      ch += '<span style="color:#8E8E93;">└ ' + EXPENSES[ei].name + expPropLabel + (EXPENSES[ei].memo ? ' (' + EXPENSES[ei].memo + ')' : '') +
+        (isOnceE ? ' <span style="font-size:10px;background:#F0F0F0;color:#6C6C70;padding:1px 5px;border-radius:4px;">일회성</span>' : '') + '</span>';
+      ch += '<span style="color:' + (isOnceE ? "#8E8E93" : "#FF9500") + ';font-weight:500;">–' + fmt(EXPENSES[ei].amount) + (isOnceE ? '만' : '만/월') + '</span></div>';
+    }
+    var otE = onetimeExpenses();
+    if (otE > 0) {
+      ch += '<div style="display:flex;justify-content:space-between;font-size:11px;padding:4px 0 0;border-top:0.5px dashed rgba(0,0,0,.1);margin-top:2px;">';
+      ch += '<span style="color:#AEAEB2;">일회성 합계</span>';
+      ch += '<span style="color:#AEAEB2;">–' + fmt(otE) + '만</span></div>';
+    }
+    ch += '</div>';
+  }
+
+  ch += '</div></div>';
+  chartEl.style.display = "";
+  chartEl.innerHTML = ch;
+
+  // ── 기타지출 목록 렌더 ────────────────────────────────────────────
+  renderExpenses();
+
+  var rows = document.createElement("div");
+  rows.className = "lcard";
+
+  for (var k = 0; k < PROPS.length; k++) {
+    var p = PROPS[k];
+    var col = COLS[k % COLS.length];
+
+    if (pendingDel && pendingDel.type === "prop" && pendingDel.id === p.id) {
+      var dc = document.createElement("div");
+      dc.className = "dconf";
+      var dtxt = document.createElement("span");
+      dtxt.className = "dconf-txt";
+      dtxt.textContent = p.name + " 을 삭제할까요?";
+      var dbtns = document.createElement("div");
+      dbtns.className = "dbtns";
+      var dcn = document.createElement("button"); dcn.className = "dcn"; dcn.textContent = "취소";
+      dcn.addEventListener("click", cancelDel);
+      var dok = document.createElement("button"); dok.className = "dok"; dok.textContent = "삭제";
+      dok.addEventListener("click", doDel);
+      dbtns.appendChild(dcn); dbtns.appendChild(dok);
+      dc.appendChild(dtxt); dc.appendChild(dbtns);
+      rows.appendChild(dc);
+    } else {
+      var row = document.createElement("div"); row.className = "lr";
+      var tr2 = totalRent(p);
+      var yldStr = tr2 ? pyld(p).toFixed(1)+"%" : "공실";
+
+      // left icon
+      var lic = document.createElement("div");
+      lic.className = "lic";
+      lic.style.background = col + "22";
+      lic.textContent = semoji(p.type);
+
+      // body
+      var lb = document.createElement("div"); lb.className = "lb";
+      var lt = document.createElement("div"); lt.className = "lt"; lt.textContent = p.name;
+      var ls = document.createElement("div"); ls.className = "ls"; ls.textContent = p.type + " · " + p.loc;
+      lb.appendChild(lt); lb.appendChild(ls);
+
+      // 대출 정보
+      if (p.loanAmt) {
+        var mi = monthlyInterest(p);
+        var loanTag = document.createElement("div");
+        loanTag.style.cssText = "font-size:11px;color:#8E8E93;margin-top:3px;";
+        loanTag.textContent = "대출 " + fmt(p.loanAmt) + "만 · " + p.loanRate + "% · 이자 " + fmt(mi) + "만/월";
+        lb.appendChild(loanTag);
+      }
+      // 실투자금 (대출 or 보증금 있을 때)
+      var ivAmt = investedAmt(p);
+      if ((p.loanAmt > 0 || p.deposit > 0) && ivAmt < p.price) {
+        var ivTag = document.createElement("div");
+        ivTag.style.cssText = "font-size:11px;color:#007AFF;margin-top:2px;font-weight:500;";
+        var rentInfo = totalRent(p) > 0 ? " · 월세 " + fmt(totalRent(p)) + "만" : "";
+        ivTag.textContent = "실투자금 " + (ivAmt >= 10000 ? (ivAmt/10000).toFixed(1)+"억" : fmt(ivAmt)+"만") + rentInfo;
+        lb.appendChild(ivTag);
+        var ivFormula = document.createElement("div");
+        ivFormula.style.cssText = "font-size:10px;color:#AEAEB2;margin-top:1px;";
+        // 보증금 부분 강조: innerHTML로 보증금만 색 다르게
+        var bd = investedBreakdown(p);
+        if (p.deposit) {
+          var depStr = "보증금 " + fmt(p.deposit) + "만";
+          bd = bd.replace(depStr, '<span style="color:#5856D6;font-weight:600;">' + depStr + '</span>');
+        }
+        ivFormula.innerHTML = bd;
+        lb.appendChild(ivFormula);
+      }
+
+      if (isMultiRoom(p)) {
+        var rtag = document.createElement("span");
+        rtag.className = "room-tag";
+        rtag.textContent = (p.rentedRooms || 0) + "/" + (p.totalRooms || 0) + "호 임대중";
+        lb.appendChild(rtag);
+      }
+
+      // right value: 매입가수익률 + 투자금수익률
+      var iy = investYield(p);
+      var invested = investedAmt(p);
+      var lv = document.createElement("div"); lv.className = "lv";
+      var lv1 = document.createElement("div"); lv1.className = "lv1"; lv1.style.color = col; lv1.textContent = yldStr;
+      lv.appendChild(lv1);
+      // 투자금이 매입가보다 적을 때만 표시 (대출 또는 보증금 있을 때)
+      var hasFunding = (p.loanAmt > 0 || p.deposit > 0);
+      if (hasFunding && tr2 && invested < p.price) {
+        // 투자금 표시
+        var lv1b = document.createElement("div");
+        lv1b.style.cssText = "font-size:10px;color:#8E8E93;margin-top:1px;";
+        lv1b.textContent = "투자금 " + (invested >= 10000 ? (invested/10000).toFixed(1)+"억" : fmt(invested)+"만");
+        lv.appendChild(lv1b);
+        // 투자수익률
+        var lv1c = document.createElement("div");
+        lv1c.style.cssText = "font-size:12px;margin-top:2px;color:#007AFF;font-weight:700;";
+        lv1c.textContent = "→ " + (iy > 0 ? iy.toFixed(1)+"%" : "0%");
+        lv.appendChild(lv1c);
+      }
+      var lv2 = document.createElement("div"); lv2.className = "lv2";
+      var bdg = document.createElement("span"); bdg.className = "bdg " + sbadge(p.status); bdg.textContent = p.status;
+      lv2.appendChild(bdg); lv.appendChild(lv2);
+
+      row.appendChild(lic); row.appendChild(lb); row.appendChild(lv);
+      rows.appendChild(row);
+
+      // action buttons
+      var ar = document.createElement("div"); ar.className = "arow";
+      var eb = document.createElement("button"); eb.className = "ae"; eb.textContent = "수정";
+      (function(pid) { eb.addEventListener("click", function() { openSheet("property", pid); }); })(p.id);
+      var db = document.createElement("button"); db.className = "ad"; db.textContent = "삭제";
+      (function(pid) { db.addEventListener("click", function() { askDel("prop", pid); }); })(p.id);
+      var cfBtn = document.createElement("button");
+      cfBtn.style.cssText = "flex:1;padding:9px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:#F2F2F7;color:#6C6C70;";
+      cfBtn.textContent = "수익현황";
+      cfBtn.addEventListener("click", function() { goTab("cashflow", true); });
+      ar.appendChild(eb); ar.appendChild(cfBtn); ar.appendChild(db);
+      rows.appendChild(ar);
+    }
+  }
+  ge("plist").innerHTML = "";
+  ge("plist").appendChild(rows);
+
+  // yield bars
+  var my = 0;
+  for (var m = 0; m < PROPS.length; m++) { if (pyld(PROPS[m]) > my) { my = pyld(PROPS[m]); } }
+  if (!my) { my = 1; }
+  var barsHtml = "";
+  for (var n = 0; n < PROPS.length; n++) {
+    var pp = PROPS[n];
+    var cc = COLS[n % COLS.length];
+    var ppRent = totalRent(pp);
+    var w = ppRent ? Math.round(pyld(pp)/my*100) : 3;
+    var label = pp.name;
+    if (isMultiRoom(pp)) { label += " (" + (pp.rentedRooms||0) + "/" + (pp.totalRooms||0) + "호)"; }
+    var iypp = investYield(pp);
+    var yldLabel = ppRent ? pyld(pp).toFixed(1)+"%" : "공실";
+    var hasFundingPP = (pp.loanAmt > 0 || pp.deposit > 0) && investedAmt(pp) < pp.price;
+    var iyLabel = (ppRent && hasFundingPP && iypp > 0) ? (" → " + iypp.toFixed(1)+"%") : "";
+    var ivAmtPP = investedAmt(pp);
+    var ivStr = (hasFundingPP && ppRent) ? (" · 투자금 " + (ivAmtPP>=10000?(ivAmtPP/10000).toFixed(1)+"억":fmt(ivAmtPP)+"만")) : "";
+    barsHtml +=
+      '<div style="margin-bottom:11px;">' +
+      '<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px;">' +
+      '<span style="color:#8E8E93;">' + label + ivStr + '</span>' +
+      '<span style="font-weight:600;">' + yldLabel +
+        (iyLabel ? '<span style="font-size:11px;color:#007AFF;font-weight:700;">' + iyLabel + '</span>' : '') +
+      '</span>' +
+      '</div>' +
+      '<div class="prog"><div class="pf" style="width:' + w + '%;background:' + (ppRent ? cc : "#AEAEB2") + ';"></div></div>' +
+      '</div>';
+  }
+  ge("ybars").innerHTML = barsHtml;
+}
+
+// ── RENDER CONTRACTS ──────────────────────────────────────────────
+function renderContracts() {
+  if (!CONTRACTS.length) {
+    ge("clist").innerHTML = '<div class="emp"><div class="emp-i">📋</div><p>오른쪽 위 + 버튼으로<br>계약을 추가하세요</p></div>';
+    return;
+  }
+  var rows = document.createElement("div"); rows.className = "lcard";
+  for (var i = 0; i < CONTRACTS.length; i++) {
+    var c = CONTRACTS[i]; var st = cstatus(c.end);
+    if (pendingDel && pendingDel.type === "contract" && pendingDel.id === c.id) {
+      var dc = document.createElement("div"); dc.className = "dconf";
+      var dtxt = document.createElement("span"); dtxt.className = "dconf-txt";
+      dtxt.textContent = c.tenant + " 계약을 삭제할까요?";
+      var dbtns = document.createElement("div"); dbtns.className = "dbtns";
+      var dcn = document.createElement("button"); dcn.className = "dcn"; dcn.textContent = "취소";
+      dcn.addEventListener("click", cancelDel);
+      var dok = document.createElement("button"); dok.className = "dok"; dok.textContent = "삭제";
+      dok.addEventListener("click", doDel);
+      dbtns.appendChild(dcn); dbtns.appendChild(dok);
+      dc.appendChild(dtxt); dc.appendChild(dbtns);
+      rows.appendChild(dc);
+    } else {
+      // ─── 계약 카드 ───────────────────────────────────────────
+      var wrap = document.createElement("div");
+      wrap.style.cssText = "background:#fff;border-radius:12px;margin-bottom:1px;overflow:hidden;";
+
+      // 메인 행
+      var row = document.createElement("div"); row.className = "lr";
+      var lic = document.createElement("div"); lic.className = "lic"; lic.style.background = "#E5F0FF"; lic.textContent = "👤";
+      var lb = document.createElement("div"); lb.className = "lb";
+      var lt = document.createElement("div"); lt.className = "lt"; lt.textContent = pname(c.propId) + " · " + (c.unit || c.tenant);
+      var ls = document.createElement("div"); ls.className = "ls"; ls.textContent = c.type;
+      var le = document.createElement("div"); le.style.cssText = "font-size:12px;color:#8E8E93;margin-top:2px;"; le.textContent = "만료 " + (c.end || "–");
+      lb.appendChild(lt); lb.appendChild(ls); lb.appendChild(le);
+      // 전화번호
+      if (c.phone) {
+        var phoneA = document.createElement("a");
+        phoneA.className = "phone-btn";
+        phoneA.href = "tel:" + c.phone.replace(/[^0-9+]/g, "");
+        phoneA.innerHTML = "📞 " + c.phone;
+        lb.appendChild(phoneA);
+      }
+      var lv = document.createElement("div"); lv.className = "lv";
+      var lv1 = document.createElement("div"); lv1.className = "lv1"; lv1.textContent = c.monthly ? fmt(c.monthly)+"만" : "전세";
+      var lv2 = document.createElement("div"); lv2.className = "lv2";
+      var bdg = document.createElement("span"); bdg.className = "bdg " + st.c; bdg.textContent = st.l;
+      lv2.appendChild(bdg); lv.appendChild(lv1); lv.appendChild(lv2);
+      row.appendChild(lic); row.appendChild(lb); row.appendChild(lv);
+      wrap.appendChild(row);
+
+      // 납부일 계산 및 납부 현황 (월세 또는 계약이 있으면 표시)
+      if (c.monthly || c.start) {
+        var now2 = new Date();
+        var startD = c.start ? new Date(c.start) : now2;
+        var payDay = startD.getDate(); // 계약 시작일의 날짜 = 매월 납부일
+        var thisMonKey = now2.getFullYear() + "-" + (now2.getMonth()+1);
+        var thisMonStatus = (c.payments && c.payments[thisMonKey]) || "none";
+
+        // 이번 달 납부 예정일
+        var dueDateThisMon = new Date(now2.getFullYear(), now2.getMonth(), payDay);
+        var diffDays = Math.ceil((dueDateThisMon - now2) / 86400000);
+
+        // 납부 알림 배너
+        var banner = document.createElement("div");
+        if (thisMonStatus === "paid" || thisMonStatus === "early") {
+          banner.className = "due-banner ok";
+          banner.innerHTML = '<span class="due-txt">' + (thisMonStatus==="early"?"⚡ 조기납부 완료":"✓ ") + (thisMonStatus!=="early"?(now2.getMonth()+1)+"월 납부 완료":"") + '</span>';
+        } else if (diffDays < 0) {
+          banner.className = "due-banner overdue";
+          banner.innerHTML = '<span class="due-txt">⚠ ' + (now2.getMonth()+1) + '월 납부일 ' + Math.abs(diffDays) + '일 경과 — 미확인</span>';
+        } else if (diffDays <= 7) {
+          banner.className = "due-banner due-soon";
+          banner.innerHTML = '<span class="due-txt">🔔 납부일 D-' + diffDays + ' (' + (now2.getMonth()+1) + '/' + payDay + '일)</span>';
+        } else {
+          banner.className = "due-banner ok";
+          banner.innerHTML = '<span class="due-txt">납부일 매월 ' + payDay + '일</span>';
+        }
+
+        // 히스토리 토글 버튼
+        var toggleBtn = document.createElement("button");
+        toggleBtn.className = "pay-hist-toggle";
+        toggleBtn.textContent = "납부 내역 보기 ▾";
+        banner.appendChild(toggleBtn);
+        wrap.appendChild(banner);
+
+        // 납부 히스토리 (계약 시작월 ~ 현재월)
+        var hist = document.createElement("div"); hist.className = "pay-hist";
+        (function(tBtn, hst) {
+          tBtn.addEventListener("click", function() {
+            hst.classList.toggle("open");
+            tBtn.textContent = hst.classList.contains("open") ? "납부 내역 접기 ▴" : "납부 내역 보기 ▾";
+          });
+        })(toggleBtn, hist);
+
+        // 월 목록 생성 (시작월 ~ 현재월, 최소 12개월 보장)
+        var months = [];
+        var defaultStart = new Date(now2.getFullYear(), now2.getMonth() - 11, 1);
+        var histStart = c.start ? new Date(startD.getFullYear(), startD.getMonth(), 1) : defaultStart;
+        // 시작일이 있어도 최소 12개월은 보여줌
+        if (histStart > defaultStart) { histStart = defaultStart; }
+        var cur2 = new Date(histStart);
+        var limit = new Date(now2.getFullYear(), now2.getMonth(), 1);
+        while (cur2 <= limit && months.length < 36) {
+          months.push({y: cur2.getFullYear(), m: cur2.getMonth()});
+          cur2.setMonth(cur2.getMonth() + 1);
+        }
+
+        // 최신이 위에 오도록 역순
+        months.reverse();
+
+        // 합계 집계
+        var paidCnt = 0, unpaidCnt = 0, noneCnt = 0, earlyCnt = 0;
+        months.forEach(function(mo) {
+          var k2 = mo.y + "-" + (mo.m+1);
+          var s2 = (c.payments && c.payments[k2]) || "none";
+          if (s2 === "paid" || s2 === "prepaid") { paidCnt++; }
+          else if (s2 === "early") { earlyCnt++; }
+          else if (s2 === "unpaid") { unpaidCnt++; }
+          else { noneCnt++; }
+        });
+
+        // 요약 행
+        var sumRow = document.createElement("div");
+        sumRow.style.cssText = "display:flex;gap:12px;padding:8px 16px 6px;background:#F8F8F8;border-top:0.5px solid rgba(0,0,0,.06);";
+        sumRow.innerHTML =
+          '<span style="font-size:11px;color:#1A7A40;font-weight:600;">납부 ' + paidCnt + '건</span>' +
+          (earlyCnt > 0 ? '<span style="font-size:11px;color:#0055CC;font-weight:600;">⚡조기 ' + earlyCnt + '건</span>' : '') +
+          '<span style="font-size:11px;color:#B91C1C;font-weight:600;">미납 ' + unpaidCnt + '건</span>' +
+          '<span style="font-size:11px;color:#AEAEB2;">미기록 ' + noneCnt + '건</span>';
+        hist.appendChild(sumRow);
+
+        months.forEach(function(mo) {
+          var k2 = mo.y + "-" + (mo.m+1);
+          var payDateStr = mo.y + "년 " + (mo.m+1) + "월 " + payDay + "일";
+          var s2 = (c.payments && c.payments[k2]) || "none";
+          var isFuture = (mo.y > now2.getFullYear()) || (mo.y === now2.getFullYear() && mo.m > now2.getMonth());
+
+          var hrow = document.createElement("div"); hrow.className = "pay-hist-row";
+
+          var dateEl = document.createElement("div"); dateEl.className = "pay-hist-date";
+          dateEl.textContent = payDateStr;
+          if (mo.y === now2.getFullYear() && mo.m === now2.getMonth()) {
+            dateEl.style.color = "#007AFF"; dateEl.style.fontWeight = "700";
+          }
+
+          var stEl = document.createElement("div"); hrow.className = "pay-hist-row";
+          var statusBadge = document.createElement("span");
+          statusBadge.className = "bdg " + (s2==="paid"||s2==="prepaid"?"bg":s2==="early"?"bb":s2==="unpaid"?"br":"bgr");
+          statusBadge.textContent = s2==="paid"?"납부":s2==="prepaid"?"✓선납완료":s2==="early"?"⚡조기납부":s2==="unpaid"?"미납":"미기록";
+
+          var btnEl = document.createElement("button");
+          if (s2 === "paid")        { btnEl.className="pay-hist-btn to-unpaid"; btnEl.textContent="미납 처리"; }
+          else if (s2 === "prepaid"){ btnEl.className="pay-hist-btn to-prepaid"; btnEl.textContent="선납취소"; }
+          else if (s2 === "early")  { btnEl.className="pay-hist-btn to-unpaid"; btnEl.textContent="미납 처리"; }
+          else if (s2 === "unpaid") { btnEl.className="pay-hist-btn to-none";   btnEl.textContent="초기화"; }
+          else                      { btnEl.className="pay-hist-btn to-early";  btnEl.textContent="조기납부"; }
+
+          (function(cid3, k3, sbEl, btnEl2, hrowEl, mo3) {
+            // 요약 재계산 공통 함수
+            function refreshSummary(paymentsObj) {
+              var pc=0,uc=0,nc=0,ec=0;
+              months.forEach(function(m4){
+                var k4=m4.y+"-"+(m4.m+1);
+                var s4=(paymentsObj&&paymentsObj[k4])||"none";
+                if(s4==="paid"||s4==="prepaid")pc++;
+                else if(s4==="early")ec++;
+                else if(s4==="unpaid")uc++;
+                else nc++;
+              });
+              sumRow.innerHTML='<span style="font-size:11px;color:#1A7A40;font-weight:600;">납부 '+pc+'건</span>'+(ec>0?'<span style="font-size:11px;color:#0055CC;font-weight:600;">⚡조기 '+ec+'건</span>':'')+'<span style="font-size:11px;color:#B91C1C;font-weight:600;">미납 '+uc+'건</span><span style="font-size:11px;color:#AEAEB2;">미기록 '+nc+'건</span>';
+            }
+
+            btnEl2.addEventListener("click", function() {
+              for (var ci3=0;ci3<CONTRACTS.length;ci3++) {
+                if (CONTRACTS[ci3].id!==cid3) { continue; }
+                if (!CONTRACTS[ci3].payments) { CONTRACTS[ci3].payments={}; }
+                var cur3 = CONTRACTS[ci3].payments[k3] || "none";
+
+                if (cur3 === "none") {
+                  // 조기납부 클릭 → 월 선택 팝업 표시
+                  // 기존 팝업 제거
+                  var existPicker = hrowEl.nextSibling;
+                  if (existPicker && existPicker.classList && existPicker.classList.contains("early-picker")) {
+                    existPicker.parentNode.removeChild(existPicker);
+                    return;
+                  }
+                  var picker = document.createElement("div"); picker.className = "early-picker";
+                  var ptitle = document.createElement("div"); ptitle.className = "early-picker-title";
+                  ptitle.textContent = "어느 달 월세를 미리 납부하셨나요?";
+                  picker.appendChild(ptitle);
+                  var pmonths = document.createElement("div"); pmonths.className = "early-picker-months";
+                  // 현재달 + 이후 6개월 복수 선택 가능
+                  var now3 = new Date();
+                  var selectedTargets = [];
+                  var pconfirmRef = null;
+                  function updateConfirmBtn() {
+                    if (pconfirmRef) {
+                      pconfirmRef.textContent = selectedTargets.length > 0
+                        ? selectedTargets.length + "개월 선납 처리하기"
+                        : "선납 처리하기";
+                      pconfirmRef.style.opacity = selectedTargets.length > 0 ? "1" : "0.5";
+                    }
+                  }
+                  for (var fi=0; fi<=6; fi++) {
+                    var fd = new Date(now3.getFullYear(), now3.getMonth()+fi, 1);
+                    var fk = fd.getFullYear()+"-"+(fd.getMonth()+1);
+                    var fLbl = (fd.getMonth()+1)+"월"+(fi===0?" (이번달)":"");
+                    var fStatus = CONTRACTS[ci3].payments[fk] || "none";
+                    var mon = document.createElement("button"); mon.className = "ep-mon";
+                    mon.textContent = fLbl;
+                    mon.dataset.key = fk;
+                    if (fStatus==="prepaid"||fStatus==="paid") {
+                      mon.className = "ep-mon already"; mon.textContent += " ✓"; mon.disabled = true;
+                    } else {
+                      mon.addEventListener("click", function() {
+                        var mk = this.dataset.key;
+                        var idx = selectedTargets.indexOf(mk);
+                        if (idx >= 0) {
+                          selectedTargets.splice(idx, 1);
+                          this.classList.remove("selected");
+                        } else {
+                          selectedTargets.push(mk);
+                          this.classList.add("selected");
+                        }
+                        updateConfirmBtn();
+                      });
+                    }
+                    pmonths.appendChild(mon);
+                  }
+                  picker.appendChild(pmonths);
+                  var pconfirm = document.createElement("button"); pconfirm.className = "ep-confirm";
+                  pconfirm.textContent = "선납 처리하기";
+                  pconfirm.style.opacity = "0.5";
+                  pconfirmRef = pconfirm;
+                  pconfirm.addEventListener("click", function() {
+                    if (!selectedTargets.length) { alert("납부할 달을 선택하세요. 복수 선택 가능합니다."); return; }
+                    // 이번달: early 로 표시
+                    CONTRACTS[ci3].payments[k3] = "early";
+                    // 선택한 달들: prepaid 로 표시
+                    for (var si=0; si<selectedTargets.length; si++) {
+                      CONTRACTS[ci3].payments[selectedTargets[si]] = "prepaid";
+                    }
+                    saveData();
+                    picker.parentNode.removeChild(picker);
+                    // 현재 행 뱃지/버튼 업데이트
+                    sbEl.className="bdg bb"; sbEl.textContent="⚡조기납부";
+                    btnEl2.className="pay-hist-btn to-unpaid"; btnEl2.textContent="미납 처리";
+                    refreshSummary(CONTRACTS[ci3].payments);
+                    // 선납된 달 행들 업데이트
+                    hist.querySelectorAll(".pay-hist-row").forEach(function(row){
+                      if(selectedTargets.indexOf(row.dataset.monthKey) >= 0){
+                        var sb2=row.querySelector(".bdg"); var btn2=row.querySelector(".pay-hist-btn");
+                        if(sb2){sb2.className="bdg bg";sb2.textContent="✓선납완료";}
+                        if(btn2){btn2.className="pay-hist-btn to-prepaid";btn2.textContent="선납취소";}
+                      }
+                    });
+                  });
+                  picker.appendChild(pconfirm);
+                  hrowEl.parentNode.insertBefore(picker, hrowEl.nextSibling);
+
+                } else if (cur3==="prepaid") {
+                  // 선납취소
+                  CONTRACTS[ci3].payments[k3] = "none";
+                  sbEl.className="bdg bgr"; sbEl.textContent="미기록";
+                  btnEl2.className="pay-hist-btn to-early"; btnEl2.textContent="조기납부";
+                  saveData(); refreshSummary(CONTRACTS[ci3].payments);
+
+                } else {
+                  // paid/early → unpaid → none 순환
+                  var next = (cur3==="paid"||cur3==="early")?"unpaid":"none";
+                  CONTRACTS[ci3].payments[k3] = next;
+                  sbEl.className = "bdg "+(next==="unpaid"?"br":"bgr");
+                  sbEl.textContent = next==="unpaid"?"미납":"미기록";
+                  if(next==="unpaid"){btnEl2.className="pay-hist-btn to-none";btnEl2.textContent="초기화";}
+                  else{btnEl2.className="pay-hist-btn to-early";btnEl2.textContent="조기납부";}
+                  saveData(); refreshSummary(CONTRACTS[ci3].payments);
+                }
+                break;
+              }
+            });
+          })(c.id, k2, statusBadge, btnEl, hrow, mo);
+
+          hrow.dataset.monthKey = k2;
+          hrow.appendChild(dateEl); hrow.appendChild(statusBadge); hrow.appendChild(btnEl);
+          hist.appendChild(hrow);
+        });
+        wrap.appendChild(hist);
+      }
+
+      // 메모
+      if (c.memo) {
+        var memoDiv = document.createElement("div"); memoDiv.className = "memo-row";
+        var memoTxt = document.createElement("div"); memoTxt.className = "memo-text";
+        memoTxt.textContent = c.memo;
+        memoDiv.appendChild(memoTxt);
+        wrap.appendChild(memoDiv);
+      }
+
+      rows.appendChild(wrap);
+      var ar = document.createElement("div"); ar.className = "arow";
+      var eb = document.createElement("button"); eb.className = "ae"; eb.textContent = "수정";
+      (function(cid) { eb.addEventListener("click", function() { openSheet("contract", cid); }); })(c.id);
+      var db = document.createElement("button"); db.className = "ad"; db.textContent = "삭제";
+      (function(cid) { db.addEventListener("click", function() { askDel("contract", cid); }); })(c.id);
+      var pfBtn = document.createElement("button");
+      pfBtn.style.cssText = "flex:1;padding:9px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:#F2F2F7;color:#6C6C70;";
+      pfBtn.textContent = "포트폴리오";
+      pfBtn.addEventListener("click", function() { goTab("portfolio", true); });
+      ar.appendChild(eb); ar.appendChild(pfBtn); ar.appendChild(db);
+      rows.appendChild(ar);
+    }
+  }
+  ge("clist").innerHTML = "";
+  ge("clist").appendChild(rows);
+}
+
+// ── RENDER EXPENSES ──────────────────────────────────────────────
+function renderExpenses() {
+  var el = ge("exp-list");
+  if (!el) { return; }
+  var periodic = EXPENSES.filter(function(e) { return e.expType !== "onetime"; });
+  var onetime  = EXPENSES.filter(function(e) { return e.expType === "onetime"; });
+
+  if (!EXPENSES.length) {
+    el.innerHTML = '<div style="padding:10px 16px 4px;font-size:13px;color:#8E8E93;">등록된 기타지출이 없습니다</div>';
+    return;
+  }
+
+  var frag = document.createDocumentFragment();
+
+  function makeExpRow(exp) {
+    var isOnce = exp.expType === "onetime";
+    var row = document.createElement("div"); row.className = "exp-row";
+    var badge = document.createElement("span");
+    badge.className = "exp-badge " + (isOnce ? "onetime" : "periodic");
+    badge.textContent = isOnce ? "일회성" : "정기";
+    var nameEl = document.createElement("div"); nameEl.className = "exp-name";
+    var propLabel = exp.propId ? " [" + pname(exp.propId) + "]" : "";
+    nameEl.textContent = exp.name + propLabel + (exp.memo ? " · " + exp.memo : "");
+    var amtEl = document.createElement("div");
+    amtEl.className = "exp-amt " + (isOnce ? "onetime" : "periodic");
+    amtEl.textContent = "–" + fmt(exp.amount) + "만" + (isOnce ? "" : "/월");
+    var delBtn = document.createElement("button"); delBtn.className = "exp-del"; delBtn.textContent = "삭제";
+    (function(eid) { delBtn.addEventListener("click", function() { deleteExpense(eid); }); })(exp.id);
+    row.appendChild(badge); row.appendChild(nameEl); row.appendChild(amtEl); row.appendChild(delBtn);
+    return row;
+  }
+
+  if (periodic.length) {
+    // 물건별로 그룹핑
+    var propGroups = {}; // propId(0=공통) -> []
+    for (var gi = 0; gi < periodic.length; gi++) {
+      var gKey = periodic[gi].propId || 0;
+      if (!propGroups[gKey]) { propGroups[gKey] = []; }
+      propGroups[gKey].push(periodic[gi]);
+    }
+    // 공통 먼저, 나머지는 물건 순서대로
+    var groupOrder = [0];
+    for (var pi2 = 0; pi2 < PROPS.length; pi2++) {
+      if (propGroups[PROPS[pi2].id]) { groupOrder.push(PROPS[pi2].id); }
+    }
+
+    var totalPeriodic = periodicExpenses();
+    var hdr1 = document.createElement("div"); hdr1.className = "exp-sec-hdr";
+    hdr1.textContent = "정기 지출 — 월 합계 " + fmt(totalPeriodic) + "만원";
+    frag.appendChild(hdr1);
+
+    for (var oi = 0; oi < groupOrder.length; oi++) {
+      var gid = groupOrder[oi];
+      if (!propGroups[gid]) { continue; }
+      var grpItems = propGroups[gid];
+      // 그룹 소제목
+      if (gid !== 0) {
+        var grpHdr = document.createElement("div");
+        grpHdr.style.cssText = "padding:8px 16px 4px;font-size:11px;font-weight:600;color:#007AFF;";
+        grpHdr.textContent = "└ " + pname(gid);
+        frag.appendChild(grpHdr);
+      }
+      var card1 = document.createElement("div"); card1.className = "lcard";
+      var grpTotal = 0;
+      for (var gi2 = 0; gi2 < grpItems.length; gi2++) {
+        card1.appendChild(makeExpRow(grpItems[gi2]));
+        grpTotal += grpItems[gi2].amount || 0;
+      }
+      // 그룹 합계 행 (2개 이상일 때)
+      if (grpItems.length >= 2) {
+        var grpTotalRow = document.createElement("div");
+        grpTotalRow.style.cssText = "padding:8px 16px;display:flex;justify-content:space-between;background:#FAFAFA;border-top:0.5px solid rgba(0,0,0,.08);";
+        var gtLbl = document.createElement("span"); gtLbl.style.cssText = "font-size:12px;color:#6C6C70;";
+        gtLbl.textContent = (gid ? pname(gid) : "공통") + " 소계";
+        var gtAmt = document.createElement("span"); gtAmt.style.cssText = "font-size:12px;font-weight:600;color:#FF9500;";
+        gtAmt.textContent = "–" + fmt(grpTotal) + "만/월";
+        grpTotalRow.appendChild(gtLbl); grpTotalRow.appendChild(gtAmt);
+        card1.appendChild(grpTotalRow);
+      }
+      frag.appendChild(card1);
+    }
+
+    // 전체 합계
+    var totalRow1 = document.createElement("div");
+    totalRow1.style.cssText = "margin:0 16px 8px;padding:10px 14px;background:#FFF4E0;border-radius:10px;display:flex;justify-content:space-between;align-items:center;";
+    var tl1 = document.createElement("span"); tl1.style.cssText = "font-size:13px;font-weight:600;color:#7A4D00;";
+    tl1.textContent = "정기 지출 월 합계";
+    var ta1 = document.createElement("span"); ta1.style.cssText = "font-size:16px;font-weight:700;color:#7A4D00;";
+    ta1.textContent = "–" + fmt(totalPeriodic) + "만/월  (연 –" + fmt(totalPeriodic*12) + "만)";
+    totalRow1.appendChild(tl1); totalRow1.appendChild(ta1);
+    frag.appendChild(totalRow1);
+  }
+
+  if (onetime.length) {
+    var hdr2 = document.createElement("div"); hdr2.className = "exp-sec-hdr";
+    hdr2.textContent = "일회성 지출 — 수익률 반영";
+    frag.appendChild(hdr2);
+    var card2 = document.createElement("div"); card2.className = "lcard";
+    for (var j = 0; j < onetime.length; j++) { card2.appendChild(makeExpRow(onetime[j])); }
+    // 합계 행
+    var totalRow = document.createElement("div");
+    totalRow.style.cssText = "padding:10px 16px;display:flex;justify-content:space-between;border-top:0.5px solid rgba(0,0,0,.1);";
+    var totalLbl = document.createElement("span"); totalLbl.style.cssText = "font-size:13px;color:#6C6C70;";
+    totalLbl.textContent = "일회성 합계";
+    var totalAmt = document.createElement("span"); totalAmt.style.cssText = "font-size:13px;font-weight:600;color:#6C6C70;";
+    totalAmt.textContent = "–" + fmt(onetimeExpenses()) + "만 (수익률 반영";
+    totalRow.appendChild(totalLbl); totalRow.appendChild(totalAmt);
+    card2.appendChild(totalRow);
+    frag.appendChild(card2);
+  }
+
+  el.innerHTML = "";
+  el.appendChild(frag);
+}
+function deleteExpense(id) {
+  EXPENSES = EXPENSES.filter(function(e) { return e.id !== id; });
+  saveData(); renderPortfolio();
+}
+var _curExpType = "periodic";
+function openExpenseSheet(expType) {
+  _curExpType = expType || "periodic";
+  var isOnce = _curExpType === "onetime";
+  var body = ge("shbdy");
+  ge("shttl").textContent = isOnce ? "일회성 지출 추가" : "정기 지출 추가";
+  body.innerHTML = "";
+  sheetType = "expense"; sheetEditId = null;
+
+  // 타입 안내 배너
+  var banner = document.createElement("div");
+  banner.style.cssText = "margin:0 16px 12px;padding:10px 14px;border-radius:10px;font-size:13px;line-height:1.5;" +
+    (isOnce ? "background:#F0F0F0;color:#444;" : "background:#FFF4E0;color:#7A4D00;");
+  banner.textContent = isOnce
+    ? "일회성 지출은 해당 금액 전체가 수익률 계산에 반영됩니다."
+    : "정기 지출은 매월 발생하는 비용으로 수익률·순수익 계산에 자동 반영됩니다.";
+  body.appendChild(banner);
+
+  var fc = document.createElement("div"); fc.className = "fc";
+  // 정기·일회성 모두 물건 선택 가능
+  var propSelHtml = '<div class="ff"><label>귀속 물건 (선택)</label><select id="f-ep"><option value="">전체 공통</option>';
+  for (var pi = 0; pi < PROPS.length; pi++) {
+    propSelHtml += '<option value="' + PROPS[pi].id + '">' + PROPS[pi].name + '</option>';
+  }
+  propSelHtml += '</select></div>';
+
+  fc.innerHTML =
+    '<div class="ff"><label>항목명 *</label><input id="f-en" placeholder="' + (isOnce ? "예) 도배, 보일러 수리" : "예) 관리비, 보험료, 수도세") + '"></div>' +
+    '<div class="ff"><label>' + (isOnce ? "지출액 (만원) *" : "월 지출액 (만원) *") + '</label><input id="f-ea" type="number" inputmode="numeric" placeholder="10"></div>' +
+    propSelHtml +
+    '<div class="ff"><label>메모 (선택)</label><input id="f-em" placeholder="' + (isOnce ? "예) 2025년 3월 도배공사" : "예) 화재보험 연납 → 월할") + '"></div>';
+  body.appendChild(fc);
+
+  var sb = document.createElement("button");
+  sb.className = "bfull bpri";
+  sb.textContent = "저장하기";
+  sb.style.cssText = "margin-top:16px;font-size:18px;padding:17px;" + (isOnce ? "background:#555;" : "");
+  sb.addEventListener("click", saveExpense);
+  var cb = document.createElement("button"); cb.className = "bfull bsec"; cb.textContent = "취소";
+  cb.addEventListener("click", closeSheet);
+  body.appendChild(sb); body.appendChild(cb);
+  ge("sov").style.display = "flex";
+}
+function saveExpense() {
+  var name = ge("f-en").value.trim();
+  var amount = parseFloat(ge("f-ea").value) || 0;
+  var memo = ge("f-em").value.trim();
+  var epEl = ge("f-ep");
+  var propId = epEl ? (parseInt(epEl.value) || 0) : 0;
+  if (!name) { alert("항목명을 입력하세요."); return; }
+  if (!amount) { alert("지출액을 입력하세요."); return; }
+  EXPENSES.push({id: nextEid++, name: name, amount: amount, memo: memo, expType: _curExpType, propId: propId});
+  saveData(); closeSheet(); renderPortfolio();
+}
+
+// ── RENDER ANNUAL ────────────────────────────────────────────────
+function renderAnnual() {
+  var MONTHS_KR = ["1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월"];
+  var curYear = new Date().getFullYear();
+  var curMonth = new Date().getMonth(); // 0-based
+
+  // ── 전체 요약 메트릭 ──────────────────────────────────────────────
+  var maxRent = 0, curRent = 0, totalMI2 = 0, totalExp2 = totalExpenses();
+  for (var i = 0; i < PROPS.length; i++) {
+    var pp = PROPS[i];
+    totalMI2 += monthlyInterest(pp);
+    curRent  += totalRent(pp);
+    if (isMultiRoom(pp)) {
+      maxRent += (pp.rent || 0) * totalRooms(pp);
+    } else {
+      maxRent += pp.rent || 0;
+    }
+  }
+  var maxNet  = maxRent  - totalMI2 - totalExp2;
+  var curNet  = curRent  - totalMI2 - totalExp2;
+  var vacancy = maxRent  - curRent;
+  var achieveRate = maxNet > 0 ? Math.round(curNet / maxNet * 100) : (curNet > 0 ? 100 : 0);
+
+  ge("an-met").innerHTML =
+    '<div class="mc"><div class="mc-l">만실 월수입</div><div class="mc-v" style="color:#34C759;">+' + fmt(maxRent) + '만</div><div class="mc-s">연 ' + fmt(maxRent*12) + '만</div></div>' +
+    '<div class="mc"><div class="mc-l">실제 월수입</div><div class="mc-v" style="color:' + (curRent >= maxRent ? "#34C759" : "#FF9500") + ';">+' + fmt(curRent) + '만</div><div class="mc-s">달성 ' + (maxRent>0?Math.round(curRent/maxRent*100):100) + '%</div></div>' +
+    '<div class="mc"><div class="mc-l">공실 손실</div><div class="mc-v" style="color:' + (vacancy>0?"#FF3B30":"#34C759") + ';">' + (vacancy>0?"-":"") + fmt(vacancy) + '만</div><div class="mc-s">월 손실액</div></div>' +
+    '<div class="mc"><div class="mc-l">만실 순수익</div><div class="mc-v">' + fmt(maxNet) + '만</div><div class="mc-s">이자·지출 차감</div></div>' +
+    '<div class="mc"><div class="mc-l">실제 순수익</div><div class="mc-v" style="color:' + (curNet>=0?"#007AFF":"#FF3B30") + ';">' + (curNet>=0?"+":"") + fmt(curNet) + '만</div><div class="mc-s">달성률 ' + achieveRate + '%</div></div>';
+
+  // ── 이번 달 기록 버튼 ────────────────────────────────────────────
+  var recWrap = ge("an-record-wrap");
+  var alreadyRecorded = false;
+  for (var ri = 0; ri < MONTHLY_RECORDS.length; ri++) {
+    if (MONTHLY_RECORDS[ri].year === curYear && MONTHLY_RECORDS[ri].month === curMonth) {
+      alreadyRecorded = true; break;
+    }
+  }
+  var recBtnHtml = alreadyRecorded
+    ? '<div style="margin:4px 16px 8px;padding:11px 14px;background:#E8F8EF;border-radius:10px;font-size:13px;color:#1A7A40;text-align:center;">' + MONTHS_KR[curMonth] + ' 기록 완료 ✓</div>'
+    : '<button class="rec-btn" id="btn-record-month">📝 ' + MONTHS_KR[curMonth] + ' 실적 기록하기 (월수입 ' + fmt(curRent) + '만)</button>';
+  recWrap.innerHTML = recBtnHtml;
+  if (!alreadyRecorded) {
+    var rb = ge("btn-record-month");
+    if (rb) {
+      rb.addEventListener("click", function() {
+        MONTHLY_RECORDS.push({
+          id: nextRid++, year: curYear, month: curMonth,
+          income: curRent, maxIncome: maxRent,
+          netIncome: curNet, maxNet: maxNet,
+          expenses: totalMI2 + totalExp2, vacancy: vacancy
+        });
+        saveData(); renderAnnual();
+      });
+    }
+  }
+
+  // ── 물건별 분석 ─────────────────────────────────────────────────
+  var anPropsEl = ge("an-props"); anPropsEl.innerHTML = "";
+  for (var k = 0; k < PROPS.length; k++) {
+    var p = PROPS[k];
+    if (!isMultiRoom(p) && !p.rent) { continue; }
+    var pMaxRent = isMultiRoom(p) ? (p.rent||0) * totalRooms(p) : (p.rent||0);
+    var pCurRent = totalRent(p);
+    var pMI = monthlyInterest(p);
+    var pVacancy = pMaxRent - pCurRent;
+    var pOccRate = pMaxRent > 0 ? Math.round(pCurRent / pMaxRent * 100) : 100;
+    var pMaxNet = pMaxRent - pMI;
+    var pCurNet = pCurRent - pMI;
+
+    // 공실 지출 (귀속된 일회성 포함)
+    var pOnetimeExp = 0;
+    for (var ei = 0; ei < EXPENSES.length; ei++) {
+      if (EXPENSES[ei].expType === "onetime" && EXPENSES[ei].propId === p.id) {
+        pOnetimeExp += EXPENSES[ei].amount || 0;
+      }
+    }
+    pCurNet -= pOnetimeExp;
+
+    var occClass = pOccRate === 100 ? "full" : pOccRate > 0 ? "partial" : "empty";
+    var occLabel = pOccRate === 100 ? "만실" : (pOccRate + "% 가동");
+    if (!isMultiRoom(p)) { occLabel = p.status === "임대중" ? "임대중" : p.status; }
+
+    var card = document.createElement("div"); card.className = "an-prop-card";
+
+    // 헤더
+    card.innerHTML =
+      '<div class="an-prop-hdr">' +
+        '<span class="an-prop-name">' + semoji(p.type) + ' ' + p.name + '</span>' +
+        '<span class="an-occ ' + occClass + '">' + occLabel + '</span>' +
+      '</div>' +
+      '<div class="an-compare">' +
+        '<div class="an-col"><div class="an-col-lbl">만실 수입</div><div class="an-col-val" style="color:#34C759;">' + fmt(pMaxRent) + '<span style="font-size:11px;">만</span></div><div class="an-col-sub">월 최대</div></div>' +
+        '<div class="an-col"><div class="an-col-lbl">실제 수입</div><div class="an-col-val" style="color:' + (pCurRent>=pMaxRent?"#34C759":"#FF9500") + ';">' + fmt(pCurRent) + '<span style="font-size:11px;">만</span></div><div class="an-col-sub">현재</div></div>' +
+        '<div class="an-col"><div class="an-col-lbl">공실 손실</div><div class="an-col-val" style="color:' + (pVacancy>0?"#FF3B30":"#8E8E93") + ';">' + (pVacancy>0?"-":"+") + fmt(pVacancy) + '<span style="font-size:11px;">만</span></div><div class="an-col-sub">월</div></div>' +
+      '</div>';
+
+    // 진행 바
+    var barPct = pMaxRent > 0 ? Math.min(100, Math.round(pCurRent/pMaxRent*100)) : 0;
+    var barColor = barPct===100 ? "#34C759" : barPct>=70 ? "#FF9500" : "#FF3B30";
+    card.innerHTML +=
+      '<div class="an-diff-bar-wrap"><div class="an-diff-bar" style="width:' + barPct + '%;background:' + barColor + ';"></div></div>' +
+      '<div class="an-diff-row"><span style="color:#8E8E93;">순수익 (이자 차감)</span>' +
+        '<span style="font-weight:600;color:' + (pCurNet>=0?"#007AFF":"#FF3B30") + ';">' +
+          '예상 ' + fmt(pMaxNet) + '만 → 실제 ' + fmt(pCurNet) + '만' +
+        '</span>' +
+      '</div>';
+    if (pOnetimeExp > 0) {
+      card.innerHTML += '<div class="an-diff-row" style="border-top:0.5px solid rgba(0,0,0,.06);padding-top:8px;"><span style="color:#FF9500;font-size:12px;">일회성 지출 차감</span><span style="color:#FF9500;font-size:12px;font-weight:600;">–' + fmt(pOnetimeExp) + '만</span></div>';
+    }
+    if (isMultiRoom(p)) {
+      card.innerHTML += '<div class="an-diff-row" style="border-top:0.5px solid rgba(0,0,0,.06);"><span style="color:#8E8E93;font-size:12px;">연간 환산 (현재 가동률 기준)</span><span style="font-weight:600;font-size:13px;color:#003A8C;">' + (pCurNet>=0?"+":"") + fmt(pCurNet*12) + '만원</span></div>';
+    }
+
+    anPropsEl.appendChild(card);
+  }
+  if (!anPropsEl.children.length) {
+    anPropsEl.innerHTML = '<div class="emp"><div class="emp-i">📊</div><p>물건을 추가하면<br>수익 분석이 표시됩니다</p></div>';
+  }
+
+  // ── 월별 기록 차트 ───────────────────────────────────────────────
+  var anMonthly = ge("an-monthly");
+  var curYearRecs = MONTHLY_RECORDS.filter(function(r){ return r.year === curYear; })
+    .sort(function(a,b){ return a.month - b.month; });
+
+  if (!curYearRecs.length) {
+    anMonthly.innerHTML = '<div style="padding:10px 16px 4px;font-size:13px;color:#8E8E93;">아직 기록이 없습니다. 이번 달 기록 버튼을 눌러 시작하세요.</div>';
+    return;
+  }
+
+  var maxInc = 0;
+  for (var mi2 = 0; mi2 < curYearRecs.length; mi2++) {
+    if (curYearRecs[mi2].maxIncome > maxInc) { maxInc = curYearRecs[mi2].maxIncome; }
+  }
+  if (!maxInc) { maxInc = 1; }
+
+  var totalRecIncome = 0, totalRecMax = 0, totalRecNet = 0;
+  for (var mi3 = 0; mi3 < curYearRecs.length; mi3++) {
+    totalRecIncome += curYearRecs[mi3].income || 0;
+    totalRecMax    += curYearRecs[mi3].maxIncome || 0;
+    totalRecNet    += curYearRecs[mi3].netIncome || 0;
+  }
+
+  var recCard = document.createElement("div"); recCard.className = "lcard";
+
+  // 연간 요약
+  recCard.innerHTML =
+    '<div style="display:flex;gap:0;border-bottom:0.5px solid rgba(0,0,0,.08);">' +
+      '<div class="cs-item"><div class="cs-lbl">' + curYear + '년 누적 수입</div><div class="cs-val" style="color:#34C759;">+' + fmt(totalRecIncome) + '만</div></div>' +
+      '<div class="cs-item"><div class="cs-lbl">만실 대비</div><div class="cs-val" style="color:' + (totalRecMax>0&&totalRecIncome>=totalRecMax?"#34C759":"#FF9500") + ';">' + (totalRecMax>0?Math.round(totalRecIncome/totalRecMax*100):100) + '%</div></div>' +
+      '<div class="cs-item"><div class="cs-lbl">누적 순수익</div><div class="cs-val" style="color:' + (totalRecNet>=0?"#007AFF":"#FF3B30") + ';">' + (totalRecNet>=0?"+":"") + fmt(totalRecNet) + '만</div></div>' +
+    '</div>';
+
+  // 월별 행
+  for (var mi4 = 0; mi4 < curYearRecs.length; mi4++) {
+    var rec = curYearRecs[mi4];
+    var recPct = Math.round((rec.income||0) / maxInc * 100);
+    var maxPct = Math.round((rec.maxIncome||0) / maxInc * 100);
+    var recColor = rec.income >= rec.maxIncome ? "#34C759" : rec.income > 0 ? "#FF9500" : "#FF3B30";
+    var row = document.createElement("div"); row.className = "rec-row";
+    row.innerHTML =
+      '<span class="rec-month">' + MONTHS_KR[rec.month] + '</span>' +
+      '<div style="flex:1;position:relative;">' +
+        '<div style="height:6px;background:#F0F0F0;border-radius:99px;overflow:hidden;">' +
+          '<div style="position:absolute;top:0;left:0;height:6px;width:' + maxPct + '%;background:#E0E0E0;border-radius:99px;"></div>' +
+          '<div style="position:absolute;top:0;left:0;height:6px;width:' + recPct + '%;background:' + recColor + ';border-radius:99px;"></div>' +
+        '</div>' +
+        '<div style="font-size:10px;color:#AEAEB2;margin-top:3px;">' +
+          '만실 ' + fmt(rec.maxIncome) + '만 / 실제 ' + fmt(rec.income) + '만' +
+        '</div>' +
+      '</div>' +
+      '<span class="rec-amt" style="color:' + (rec.netIncome>=0?"#007AFF":"#FF3B30") + ';">' + (rec.netIncome>=0?"+":"") + fmt(rec.netIncome) + '만</span>';
+    var delBtn = document.createElement("button"); delBtn.className = "rec-del"; delBtn.textContent = "삭제";
+    (function(rid2) {
+      delBtn.addEventListener("click", function() {
+        MONTHLY_RECORDS = MONTHLY_RECORDS.filter(function(r){ return r.id !== rid2; });
+        saveData(); renderAnnual();
+      });
+    })(rec.id);
+    row.appendChild(delBtn);
+    recCard.appendChild(row);
+  }
+  anMonthly.innerHTML = "";
+  anMonthly.appendChild(recCard);
+}
+
+// ── RENDER RENT MANAGER ──────────────────────────────────────────
+var _rmYear = new Date().getFullYear();
+var _rmMonth = new Date().getMonth(); // 0-based
+
+function renderRentMgr() {
+  var MONTHS_KR = ["1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월"];
+  var now = new Date();
+
+  // 월 네비게이션
+  var nav = ge("rm-month-nav");
+  nav.innerHTML = "";
+  var prevBtn = document.createElement("button"); prevBtn.className = "rm-nav-btn"; prevBtn.textContent = "◀";
+  prevBtn.addEventListener("click", function() {
+    _rmMonth--; if (_rmMonth < 0) { _rmMonth = 11; _rmYear--; }
+    renderRentMgr();
+  });
+  var monthLbl = document.createElement("div"); monthLbl.className = "rm-month-label";
+  monthLbl.textContent = _rmYear + "년 " + MONTHS_KR[_rmMonth];
+  var nextBtn = document.createElement("button"); nextBtn.className = "rm-nav-btn"; nextBtn.textContent = "▶";
+  nextBtn.addEventListener("click", function() {
+    _rmMonth++; if (_rmMonth > 11) { _rmMonth = 0; _rmYear++; }
+    renderRentMgr();
+  });
+  nav.appendChild(prevBtn); nav.appendChild(monthLbl); nav.appendChild(nextBtn);
+
+  var monthKey = _rmYear + "-" + (_rmMonth + 1);
+
+  // 이번 달 계약들 수집 (계약이 있으면 모두 표시)
+  var activeContracts = CONTRACTS.filter(function(c) {
+    if (c.start && new Date(c.start) > new Date(_rmYear, _rmMonth + 1, 0)) { return false; }
+    if (c.end && new Date(c.end) < new Date(_rmYear, _rmMonth, 1)) { return false; }
+    return true;
+  });
+
+  // 전체 요약
+  var totalPaid = 0, totalUnpaid = 0, totalAmt = 0, totalNone = 0;
+  activeContracts.forEach(function(c) {
+    var s = (c.payments && c.payments[monthKey]) || "none";
+    totalAmt += c.monthly || 0;
+    if (s === "paid" || s === "early" || s === "prepaid") { totalPaid += c.monthly || 0; }
+    else if (s === "unpaid") { totalUnpaid += c.monthly || 0; }
+    else { totalNone += c.monthly || 0; }
+  });
+
+  // 가구수 집계
+  var cntPaid = 0, cntUnpaid = 0, cntNone = 0;
+  activeContracts.forEach(function(c) {
+    var s = (c.payments && c.payments[monthKey]) || "none";
+    if (s==="paid"||s==="early"||s==="prepaid") { cntPaid++; }
+    else if (s==="unpaid") { cntUnpaid++; }
+    else { cntNone++; }
+  });
+
+  var sumEl = ge("rm-summary");
+  sumEl.innerHTML =
+    '<div class="rm-sum-item"><div class="rm-sum-lbl">납부완료 <span style="color:#1A7A40;font-weight:700;">' + cntPaid + '가구</span></div><div class="rm-sum-val" style="color:#1A7A40;">+' + fmt(totalPaid) + '만</div></div>' +
+    '<div class="rm-sum-item"><div class="rm-sum-lbl">미납 <span style="color:#B91C1C;font-weight:700;">' + cntUnpaid + '가구</span></div><div class="rm-sum-val" style="color:#B91C1C;">' + (totalUnpaid?"-"+fmt(totalUnpaid):"–") + '만</div></div>' +
+    '<div class="rm-sum-item"><div class="rm-sum-lbl">공실 <span style="color:#AEAEB2;font-weight:700;">' + cntNone + '가구</span></div><div class="rm-sum-val" style="color:#AEAEB2;">' + fmt(totalNone) + '만</div></div>' +
+    '<div class="rm-sum-item"><div class="rm-sum-lbl">전체</div><div class="rm-sum-val">' + fmt(totalAmt) + '만</div></div>';
+
+  // 물건별 그룹핑
+  var listEl = ge("rm-list"); listEl.innerHTML = "";
+
+  if (!activeContracts.length) {
+    listEl.innerHTML = '<div class="emp"><div class="emp-i">💰</div><p>이번 달 활성 계약이 없습니다</p></div>';
+    return;
+  }
+
+  // 물건별로 묶기
+  var propMap = {};
+  activeContracts.forEach(function(c) {
+    var pid = c.propId || 0;
+    if (!propMap[pid]) { propMap[pid] = []; }
+    propMap[pid].push(c);
+  });
+
+  // 물건 순서대로 렌더
+  var propOrder = PROPS.map(function(p){ return p.id; });
+  propOrder.push(0); // 물건 없는 계약
+
+  propOrder.forEach(function(pid) {
+    var prop = null;
+    for (var pi=0; pi<PROPS.length; pi++) { if (PROPS[pi].id===pid) { prop=PROPS[pi]; break; } }
+    var propName = prop ? prop.name : "물건 미지정";
+
+    // 다가구원룸: 계약 없는 호실을 공실로 추가
+    var contracts = propMap[pid] ? propMap[pid].slice() : [];
+    var vacantRows = []; // 공실 호실 목록
+    if (prop && isMultiRoom(prop)) {
+      var rooms = propRooms(prop);
+      rooms.forEach(function(roomNum) {
+        var roomLabel = roomNum + "호";
+        var hasContract = false;
+        for (var ci=0; ci<contracts.length; ci++) {
+          var unitKey = (contracts[ci].unit||"").split(" ")[0];
+          if (unitKey === roomNum || unitKey === roomLabel) { hasContract = true; break; }
+        }
+        if (!hasContract) { vacantRows.push(roomLabel); }
+      });
+    }
+
+    if (!contracts.length && !vacantRows.length) { return; }
+
+    // 물건 납부 현황 집계
+    var pPaid = 0, pTotal = contracts.length + vacantRows.length;
+    contracts.forEach(function(c) {
+      var s = (c.payments && c.payments[monthKey]) || "none";
+      if (s==="paid"||s==="early"||s==="prepaid") { pPaid++; }
+    });
+    var statClass = pPaid===pTotal ? "all-paid" : pPaid===0 ? "none-paid" : "partial";
+    var statLabel = pPaid + "/" + pTotal + " 납부" + (vacantRows.length > 0 ? " · 공실 " + vacantRows.length + "호" : "");
+    if (pPaid===pTotal && vacantRows.length===0) { statLabel = "전액 납부 ✓"; }
+
+    var card = document.createElement("div"); card.className = "rm-prop-card";
+
+    // 헤더
+    var hdr = document.createElement("div"); hdr.className = "rm-prop-hdr";
+    var title = document.createElement("div"); title.className = "rm-prop-title";
+    title.textContent = (prop ? semoji(prop.type) + " " : "") + propName;
+    var stat = document.createElement("div"); stat.className = "rm-prop-stat " + statClass;
+    stat.textContent = statLabel;
+    hdr.appendChild(title); hdr.appendChild(stat);
+    card.appendChild(hdr);
+
+    // 세입자 행
+    contracts.forEach(function(c) {
+      var s = (c.payments && c.payments[monthKey]) || "none";
+      var row = document.createElement("div"); row.className = "rm-tenant-row";
+
+      // 납부일
+      var payDay = c.start ? new Date(c.start).getDate() : 1;
+      var nameEl = document.createElement("div"); nameEl.className = "rm-tenant-name";
+      nameEl.innerHTML = (c.unit || c.tenant) +
+        '<span style="font-size:11px;color:#AEAEB2;margin-left:5px;">매월 ' + payDay + '일</span>';
+
+      // 전화 링크
+      if (c.phone) {
+        var ph = document.createElement("a");
+        ph.href = "tel:" + c.phone.replace(/[^0-9+]/g,"");
+        ph.style.cssText = "font-size:11px;color:#007AFF;text-decoration:none;";
+        ph.textContent = "📞";
+        nameEl.appendChild(ph);
+      }
+
+      var amtEl = document.createElement("div"); amtEl.className = "rm-tenant-amt";
+      amtEl.textContent = fmt(c.monthly) + "만";
+      // 탭하면 금액 수정 가능
+      (function(cid2, aEl) {
+        aEl.addEventListener("click", function() {
+          if (aEl.querySelector("input")) { return; } // 이미 편집 중
+          var contr2 = null;
+          for (var ci2=0; ci2<CONTRACTS.length; ci2++) { if (CONTRACTS[ci2].id===cid2) { contr2=CONTRACTS[ci2]; break; } }
+          if (!contr2) { return; }
+          var inp = document.createElement("input");
+          inp.className = "rm-amt-input";
+          inp.type = "number"; inp.inputMode = "numeric";
+          inp.value = contr2.monthly || 0;
+          aEl.textContent = "";
+          var suffix = document.createElement("span"); suffix.style.cssText="font-size:11px;color:#007AFF;";suffix.textContent="만";
+          aEl.appendChild(inp); aEl.appendChild(suffix);
+          inp.focus(); inp.select();
+          function applyChange() {
+            var newAmt = parseFloat(inp.value) || 0;
+            contr2.monthly = newAmt;
+            saveData();
+            aEl.innerHTML = "";
+            aEl.textContent = fmt(newAmt) + "만";
+            // 요약 바 갱신
+            renderRentMgr();
+          }
+          inp.addEventListener("blur", applyChange);
+          inp.addEventListener("keydown", function(e) { if (e.key==="Enter") { inp.blur(); } });
+        });
+      })(c.id, amtEl);
+
+      // 납부 상태 버튼 (탭하면 순환)
+      var payBtn = document.createElement("button");
+      payBtn.className = "rm-pay-btn s-" + s;
+      payBtn.textContent = s==="paid"?"✓납부":s==="early"?"⚡조기":s==="prepaid"?"✓선납":s==="unpaid"?"✗미납":"공실";
+
+      (function(cid, mk, btn, statEl, hdrStatEl) {
+        btn.addEventListener("click", function() {
+          for (var ci=0; ci<CONTRACTS.length; ci++) {
+            if (CONTRACTS[ci].id !== cid) { continue; }
+            if (!CONTRACTS[ci].payments) { CONTRACTS[ci].payments = {}; }
+            var cur = CONTRACTS[ci].payments[mk] || "none";
+            var next = cur==="none"?"paid":cur==="paid"?"unpaid":cur==="unpaid"?"none":"paid";
+            CONTRACTS[ci].payments[mk] = next;
+            btn.className = "rm-pay-btn s-" + next;
+            btn.textContent = next==="paid"?"✓납부":next==="unpaid"?"✗미납":"공실";
+            saveData();
+            // 물건 헤더 통계 업데이트
+            var newPaid = 0;
+            contracts.forEach(function(c2) {
+              var s2 = (CONTRACTS.filter(function(x){return x.id===c2.id;})[0] || c2);
+              var st2 = (s2.payments && s2.payments[mk]) || "none";
+              if (st2==="paid"||st2==="early"||st2==="prepaid") { newPaid++; }
+            });
+            var newStatClass = newPaid===pTotal?"all-paid":newPaid===0?"none-paid":"partial";
+            hdrStatEl.className = "rm-prop-stat " + newStatClass;
+            hdrStatEl.textContent = newPaid===pTotal?"전액 납부 ✓":newPaid+"/"+pTotal+" 납부";
+            // 전체 요약 업데이트
+            var tp=0,tu=0,tn=0;
+            activeContracts.forEach(function(ac){
+              var contr = CONTRACTS.filter(function(x){return x.id===ac.id;})[0]||ac;
+              var ss=(contr.payments&&contr.payments[mk])||"none";
+              if(ss==="paid"||ss==="early"||ss==="prepaid"){tp+=ac.monthly||0;}
+              else if(ss==="unpaid"){tu+=ac.monthly||0;}
+              else{tn+=ac.monthly||0;}
+            });
+            var cp2=0,cu2=0,cn2=0;
+            activeContracts.forEach(function(ac){
+              var contr2=CONTRACTS.filter(function(x){return x.id===ac.id;})[0]||ac;
+              var ss2=(contr2.payments&&contr2.payments[mk])||"none";
+              if(ss2==="paid"||ss2==="early"||ss2==="prepaid"){cp2++;}
+              else if(ss2==="unpaid"){cu2++;}
+              else{cn2++;}
+            });
+            sumEl.innerHTML=
+              '<div class="rm-sum-item"><div class="rm-sum-lbl">납부완료 <span style="color:#1A7A40;font-weight:700;">'+cp2+'가구</span></div><div class="rm-sum-val" style="color:#1A7A40;">+'+fmt(tp)+'만</div></div>'+
+              '<div class="rm-sum-item"><div class="rm-sum-lbl">미납 <span style="color:#B91C1C;font-weight:700;">'+cu2+'가구</span></div><div class="rm-sum-val" style="color:#B91C1C;">'+(tu?"-"+fmt(tu):"–")+'만</div></div>'+
+              '<div class="rm-sum-item"><div class="rm-sum-lbl">공실 <span style="color:#AEAEB2;font-weight:700;">'+cn2+'가구</span></div><div class="rm-sum-val" style="color:#AEAEB2;">0만</div></div>'+
+              '<div class="rm-sum-item"><div class="rm-sum-lbl">전체</div><div class="rm-sum-val">'+fmt(totalAmt)+'만</div></div>';
+            break;
+          }
+        });
+      })(c.id, monthKey, payBtn, stat, stat);
+
+      row.appendChild(nameEl); row.appendChild(amtEl); row.appendChild(payBtn);
+      card.appendChild(row);
+    });
+
+    // 공실 호실 행 추가
+    vacantRows.forEach(function(roomLabel) {
+      var row = document.createElement("div"); row.className = "rm-tenant-row";
+      var nameEl = document.createElement("div"); nameEl.className = "rm-tenant-name";
+      nameEl.innerHTML = roomLabel + '<span style="font-size:11px;color:#AEAEB2;margin-left:5px;">공실</span>';
+      var amtEl = document.createElement("div"); amtEl.className = "rm-tenant-amt";
+      amtEl.style.color = "#AEAEB2";
+      amtEl.textContent = "0만";
+      var vacBtn = document.createElement("button");
+      vacBtn.className = "rm-pay-btn s-none";
+      vacBtn.textContent = "공실";
+      vacBtn.disabled = true;
+      vacBtn.style.opacity = "0.5";
+      row.appendChild(nameEl); row.appendChild(amtEl); row.appendChild(vacBtn);
+      card.appendChild(row);
+    });
+
+    listEl.appendChild(card);
+  });
+}
+
+// ── RENDER CASHFLOW ───────────────────────────────────────────────
+function renderCashflow() {
+  var tr = 0, totalLoanInterest = 0;
+  for (var i = 0; i < PROPS.length; i++) {
+    tr += totalRent(PROPS[i]);
+    totalLoanInterest += monthlyInterest(PROPS[i]);
+  }
+  var ar = tr * 12;
+  var loan = totalLoanInterest;
+  var otherExp = totalExpenses();
+  var est = Math.round(ar * 0.09);
+  var op = Math.round(ar * 0.06);
+  var netM = tr - loan - otherExp;
+  ge("cf-met").innerHTML =
+    '<div class="mc"><div class="mc-l">월 수입</div><div class="mc-v" style="color:#34C759;">' + fmt(tr) + '만</div><div class="mc-s">연 ' + fmt(ar) + '만</div></div>' +
+    '<div class="mc"><div class="mc-l">월 대출이자</div><div class="mc-v" style="color:#FF3B30;">' + fmt(loan) + '만</div><div class="mc-s">실제 집계</div></div>' +
+    '<div class="mc"><div class="mc-l">기타 지출</div><div class="mc-v" style="color:#FF9500;">' + fmt(otherExp) + '만</div><div class="mc-s">연 ' + fmt(otherExp*12) + '만</div></div>' +
+    '<div class="mc"><div class="mc-l">월 순수익</div><div class="mc-v" style="color:' + (netM >= 0 ? "#007AFF" : "#FF3B30") + ';">' + (netM >= 0 ? "+" : "") + fmt(netM) + '만</div><div class="mc-s">연 ' + (netM*12 >= 0 ? "+" : "") + fmt(netM*12) + '만</div></div>';
+  var items = "";
+  for (var k = 0; k < PROPS.length; k++) {
+    var p = PROPS[k];
+    var tr2 = totalRent(p);
+    var nameStr = p.name + (isMultiRoom(p) ? " (" + (p.rentedRooms||0) + "/" + (p.totalRooms||0) + "호)" : "");
+    var mi2 = monthlyInterest(p);
+    // 이 물건에 귀속된 지출 합산 (정기 귀속분 + 공통 정기 + 일회성)
+    var propPeriodicExp = periodicExpenses(p.id); // 공통 + 귀속 정기지출
+    var propOnetimeExp = 0;
+    for (var oi = 0; oi < EXPENSES.length; oi++) {
+      if (EXPENSES[oi].expType === "onetime" && EXPENSES[oi].propId === p.id) {
+        propOnetimeExp += EXPENSES[oi].amount || 0;
+      }
+    }
+    var netIncome = tr2 - mi2 - propOnetimeExp;
+    var incomeStr = tr2 ? "+" + fmt(tr2) + "만" : "공실";
+    var expNote = mi2 ? " · 이자 "+fmt(mi2)+"만" : "";
+    if (propOnetimeExp > 0) { expNote += " · 일회성 –"+fmt(propOnetimeExp)+"만"; }
+    var netStr = (tr2 && (mi2 || propOnetimeExp)) ? '<span style="font-size:11px;color:' + (netIncome>0?"#34C759":"#FF3B30") + ';">실질 ' + (netIncome>0?"+":"") + fmt(netIncome) + '만</span>' : "";
+    items += '<div class="rrow"><span class="rk">' + nameStr + '<br><span style="font-size:12px;">' + p.status + expNote + '</span></span>' +
+      '<span class="rv2" style="text-align:right;"><span style="color:' + (tr2 ? "#34C759" : "#FF3B30") + ';display:block;">' + incomeStr + '</span>' + netStr + '</span></div>';
+  }
+  ge("cf-items").innerHTML = items || '<div class="rrow"><span class="rk" style="color:#8E8E93;">물건 없음</span><span></span></div>';
+  var annNet = netM * 12;
+  var otE2 = onetimeExpenses();
+  ge("cf-ann").innerHTML =
+    '<div class="rrow"><span class="rk">연간 임대수입</span><span class="rv2" style="color:#34C759;">+' + fmt(ar) + '만원</span></div>' +
+    '<div class="rrow"><span class="rk">대출 이자</span><span class="rv2" style="color:#FF3B30;">–' + fmt(loan*12) + '만원</span></div>' +
+    (otherExp > 0 ? '<div class="rrow"><span class="rk">정기 지출</span><span class="rv2" style="color:#FF9500;">–' + fmt(otherExp*12) + '만원</span></div>' : '') +
+    '<div class="rrow"><span class="rk">운영·수선비(추정)</span><span class="rv2" style="color:#FF3B30;">–' + fmt(op) + '만원</span></div>' +
+    '<div class="rrow"><span class="rk">임대소득세(추정)</span><span class="rv2" style="color:#FF3B30;">–' + fmt(est) + '만원</span></div>' +
+    '<div class="rrow" style="background:#E5F0FF;"><span style="font-size:14px;font-weight:700;color:#007AFF;">연간 순이익</span>' +
+    '<span style="font-size:17px;font-weight:700;color:' + (annNet >= 0 ? "#003A8C" : "#FF3B30") + ';">' + (annNet >= 0 ? "+" : "") + fmt(annNet) + '만원</span></div>' +
+    (otE2 > 0 ? '<div class="rrow" style="background:#F8F8F8;"><span class="rk" style="color:#AEAEB2;">일회성 지출 합계 <span sspan><span class="rv2" style="color:#AEAEB2;">–' + fmt(otE2) + '만원</span></div>' : '');
+}
+
+// ── DELETE ────────────────────────────────────────────────────────
+function askDel(type, id) {
+  pendingDel = {type:type, id:id};
+  if (type === "prop") { renderPortfolio(); } else { renderContracts(); }
+}
+function cancelDel() {
+  pendingDel = null;
+  if (curTab === "portfolio") { renderPortfolio(); } else { renderContracts(); }
+}
+function doDel() {
+  if (!pendingDel) { return; }
+  if (pendingDel.type === "prop") {
+    var newProps = [];
+    for (var i = 0; i < PROPS.length; i++) { if (PROPS[i].id !== pendingDel.id) { newProps.push(PROPS[i]); } }
+    PROPS = newProps;
+  } else {
+    var newContracts = [];
+    for (var i = 0; i < CONTRACTS.length; i++) { if (CONTRACTS[i].id !== pendingDel.id) { newContracts.push(CONTRACTS[i]); } }
+    CONTRACTS = newContracts;
+  }
+  var t = pendingDel.type;
+  var delPropId = (t === "contract" && pendingDel) ? 0 : 0; // already cleared
+  pendingDel = null;
+  saveData();
+  if (t === "prop") { renderPortfolio(); }
+  else {
+    // 삭제된 계약의 물건도 동기화
+    for (var si = 0; si < PROPS.length; si++) { syncPropFromContracts(PROPS[si].id); }
+    saveData();
+    renderContracts(); renderPortfolio();
+  }
+}
+
+// ── SHEET ─────────────────────────────────────────────────────────
+function openSheet(type, id) {
+  sheetType = type; sheetEditId = id;
+  var isEdit = (id !== null && id !== undefined);
+  ge("shttl").textContent = type === "property" ? (isEdit ? "물건 수정" : "물건 추가") : (isEdit ? "계약 수정" : "계약 추가");
+  var body = ge("shbdy");
+  body.innerHTML = "";
+
+  if (type === "property") {
+    var p = {};
+    if (isEdit) {
+      for (var i = 0; i < PROPS.length; i++) { if (PROPS[i].id === id) { p = PROPS[i]; break; } }
+    }
+    var curType = p.type || "아파트";
+    var curStatus = p.status || "공실";
+    var typeOpts = "";
+    for (var i = 0; i < PTYPES.length; i++) {
+      typeOpts += '<option' + (PTYPES[i] === curType ? ' selected' : '') + '>' + PTYPES[i] + '</option>';
+    }
+    var stOpts = "";
+    for (var i = 0; i < PSTATUS.length; i++) {
+      stOpts += '<option' + (PSTATUS[i] === curStatus ? ' selected' : '') + '>' + PSTATUS[i] + '</option>';
+    }
+
+    // Build form
+    var fc = document.createElement("div"); fc.className = "fc";
+
+    function makeFF(labelText, inputEl) {
+      var ff = document.createElement("div"); ff.className = "ff";
+      var lbl = document.createElement("label"); lbl.textContent = labelText;
+      ff.appendChild(lbl); ff.appendChild(inputEl);
+      return ff;
+    }
+    function makeInput(id2, type2, val, mode) {
+      var inp = document.createElement("input");
+      inp.id = id2; inp.type = type2;
+      if (mode) { inp.setAttribute("inputmode", mode); }
+      if (val !== undefined && val !== null) { inp.value = val; }
+      return inp;
+    }
+    function makeSelect(id2, optHtml) {
+      var sel = document.createElement("select"); sel.id = id2; sel.innerHTML = optHtml; return sel;
+    }
+
+    var inName = makeInput("f-nm", "text", p.name || ""); inName.placeholder = "예) 신길동 원룸";
+    var selType = makeSelect("f-ty", typeOpts);
+    var inLoc = makeInput("f-lc", "text", p.loc || ""); inLoc.placeholder = "예) 서울시 영등포구 신길동";
+    var inPrice = makeInput("f-pr", "number", p.price || "", "numeric");
+    var inDep = makeInput("f-dp", "number", p.deposit || "", "numeric");
+    var inRent = makeInput("f-rt", "number", p.rent || "", "numeric");
+    var selSt = makeSelect("f-st", stOpts);
+
+    fc.appendChild(makeFF("물건명 *", inName));
+    fc.appendChild(makeFF("종류", selType));
+    fc.appendChild(makeFF("주소", inLoc));
+    fc.appendChild(makeFF("시세/매입가 (만원) *", inPrice));
+
+    // 대출 섹션 (시세 아래)
+    var loanDiv = document.createElement("div");
+    loanDiv.className = "ff";
+    loanDiv.style.background = "#F8F8F8";
+    var loanLbl = document.createElement("label"); loanLbl.textContent = "대출 금액 (만원, 없으면 0)";
+    var inLoanAmt = makeInput("f-la", "number", p.loanAmt || 0, "numeric");
+    loanDiv.appendChild(loanLbl); loanDiv.appendChild(inLoanAmt);
+    fc.appendChild(loanDiv);
+
+    var loanRateDiv = document.createElement("div");
+    loanRateDiv.className = "ff";
+    loanRateDiv.style.background = "#F8F8F8";
+    var loanRateLbl = document.createElement("label"); loanRateLbl.textContent = "대출 이자율 (%, 연)";
+    var inLoanRate = makeInput("f-lr", "number", p.loanRate || 0, "decimal");
+    inLoanRate.step = "0.1";
+    loanRateDiv.appendChild(loanRateLbl); loanRateDiv.appendChild(inLoanRate);
+    fc.appendChild(loanRateDiv);
+
+    fc.appendChild(makeFF("보증금 (만원)", inDep));
+
+    // Rent label changes for multiroom
+    var rentLabel = curType === "다가구원룸" ? "방당 월세 (만원)" : "월세 (만원, 전세=0)";
+    var rentFF = makeFF(rentLabel, inRent);
+    rentFF.id = "ff-rent";
+    fc.appendChild(rentFF);
+    fc.appendChild(makeFF("상태", selSt));
+
+    // 호실 구성 섹션 (다가구원룸 전용)
+    var roomSec = document.createElement("div");
+    roomSec.className = "room-section";
+    roomSec.id = "room-section";
+    roomSec.style.display = curType === "다가구원룸" ? "" : "none";
+
+    var rsTitle = document.createElement("div");
+    rsTitle.className = "room-section-title";
+    rsTitle.textContent = "🏠 호실 구성";
+    roomSec.appendChild(rsTitle);
+
+    // 층/호실 범위 설정
+    var configDiv = document.createElement("div"); configDiv.className = "room-config";
+    configDiv.innerHTML =
+      '<label>시작층</label><input id="rc-sf" type="number" value="2" min="1" max="20">' +
+      '<label>끝층</label><input id="rc-ef" type="number" value="5" min="1" max="20">' +
+      '<label>호수</label><input id="rc-sr" type="number" value="01" min="1" max="20" style="width:40px;">~' +
+      '<input id="rc-er" type="number" value="06" min="1" max="20" style="width:40px;">' +
+      '<button id="rc-build">구성</button>';
+    roomSec.appendChild(configDiv);
+
+    // 호실 그리드 (on = 있음, off = 없음)
+    var buildGrid = document.createElement("div"); buildGrid.className = "room-build-grid"; buildGrid.id = "rc-grid";
+    roomSec.appendChild(buildGrid);
+
+    // 현재 저장된 rooms 배열
+    var _rooms = (p.rooms && Array.isArray(p.rooms)) ? p.rooms.slice() : [];
+
+    function buildRoomGrid() {
+      var sf = parseInt(ge("rc-sf").value) || 2;
+      var ef = parseInt(ge("rc-ef").value) || 5;
+      var sr = parseInt(ge("rc-sr").value) || 1;
+      var er = parseInt(ge("rc-er").value) || 6;
+      if (sf > ef) { ef = sf; }
+      if (sr > er) { er = sr; }
+      buildGrid.innerHTML = "";
+      for (var fl = sf; fl <= ef; fl++) {
+        for (var rm = sr; rm <= er; rm++) {
+          var roomNum = fl + "" + (rm < 10 ? "0" + rm : rm);
+          var isOn = _rooms.indexOf(roomNum) >= 0;
+          var cell = document.createElement("div");
+          cell.className = "rb-cell " + (isOn ? "on" : "off-cell");
+          cell.dataset.room = roomNum;
+          var sp = document.createElement("span"); sp.textContent = roomNum;
+          cell.appendChild(sp);
+          cell.addEventListener("click", function() {
+            var rn = this.dataset.room;
+            var idx = _rooms.indexOf(rn);
+            if (idx >= 0) { _rooms.splice(idx, 1); this.className = "rb-cell off-cell"; }
+            else { _rooms.push(rn); _rooms.sort(); this.className = "rb-cell on"; }
+            updateRoomCount();
+          }.bind(cell));
+          buildGrid.appendChild(cell);
+        }
+      }
+      updateRoomCount();
+    }
+    function updateRoomCount() {
+      rsTitle.textContent = "🏠 호실 구성 — " + _rooms.length + "개 선택됨";
+    }
+
+    // 기존 데이터 있으면 층/호실 범위 자동 추정
+    if (_rooms.length > 0) {
+      var floors = _rooms.map(function(r){ return parseInt(r.substring(0, r.length-2)); }).filter(Boolean);
+      var nums = _rooms.map(function(r){ return parseInt(r.substring(r.length-2)); }).filter(Boolean);
+      if (floors.length) {
+        ge("rc-sf") && (document.getElementById("rc-sf") ? document.getElementById("rc-sf").value = Math.min.apply(null, floors) : null);
+        if (ge("rc-sf")) ge("rc-sf").value = Math.min.apply(null, floors);
+        if (ge("rc-ef")) ge("rc-ef").value = Math.max.apply(null, floors);
+        if (ge("rc-sr")) ge("rc-sr").value = Math.min.apply(null, nums);
+        if (ge("rc-er")) ge("rc-er").value = Math.max.apply(null, nums);
+      }
+    }
+    // 구성 버튼 이벤트는 DOM 삽입 후에 연결 (아래)
+
+    fc.appendChild(roomSec);
+    body.appendChild(fc);
+
+    // Wire type change
+    selType.addEventListener("change", function() {
+      var isM = selType.value === "다가구원룸";
+      ge("room-section").style.display = isM ? "" : "none";
+      var lbl = ge("ff-rent").querySelector("label");
+      if (lbl) { lbl.textContent = isM ? "방당 월세 (만원)" : "월세 (만원, 전세=0)"; }
+    });
+
+    // 구성 버튼 + 초기 그리드
+    setTimeout(function() {
+      var buildBtn = ge("rc-build");
+      if (buildBtn) { buildBtn.addEventListener("click", function() { _rooms = []; buildRoomGrid(); }); }
+      buildRoomGrid();
+    }, 0);
+
+    // 저장하기 버튼 — 크고 눈에 잘 띄게
+    var sb = document.createElement("button");
+    sb.className = "bfull bpri";
+    sb.textContent = "저장하기";
+    sb.style.cssText = "margin-top:16px;font-size:18px;padding:17px;";
+    sb.addEventListener("click", saveProperty);
+    var cb = document.createElement("button"); cb.className = "bfull bsec"; cb.textContent = "취소";
+    cb.addEventListener("click", closeSheet);
+    body.appendChild(sb); body.appendChild(cb);
+
+  } else {
+    // Contract form
+    var c = {};
+    if (isEdit) {
+      for (var j = 0; j < CONTRACTS.length; j++) { if (CONTRACTS[j].id === id) { c = CONTRACTS[j]; break; } }
+    }
+    var propOpts = "";
+    for (var i = 0; i < PROPS.length; i++) {
+      propOpts += '<option value="' + PROPS[i].id + '"' + (c.propId === PROPS[i].id ? ' selected' : '') + '>' + PROPS[i].name + '</option>';
+    }
+    if (!propOpts) { propOpts = '<option value="">물건 없음</option>'; }
+    var ctypes = ["월세","전세","상가임대"];
+    var ctOpts = "";
+    for (var i = 0; i < ctypes.length; i++) {
+      ctOpts += '<option' + ((c.type || "월세") === ctypes[i] ? ' selected' : '') + '>' + ctypes[i] + '</option>';
+    }
+    var cfc = document.createElement("div"); cfc.className = "fc";
+    cfc.innerHTML =
+      '<div class="ff"><label>계약 물건 *</label><select id="f-pp">' + propOpts + '</select></div>' +
+      '<div class="ff"><label>호수 / 이름 *</label><input id="f-tu" value="' + (c.unit||"") + '" placeholder="예) 203호 임성환"></div>' +
+      '<div class="ff"><label>계약 유형</label><select id="f-ct">' + ctOpts + '</select></div>' +
+      '<div class="ff"><label>보증금 (만원)</label><input id="f-cd" type="number" inputmode="numeric" value="' + (c.deposit||"") + '"></div>' +
+      '<div class="ff"><label>월세 (만원)</label><input id="f-cm" type="number" inputmode="numeric" value="' + (c.monthly||"") + '"></div>' +
+      '<div class="ff"><label>계약 시작일</label><input id="f-cs" type="date" value="' + (c.start||"") + '"></div>' +
+      '<div class="ff"><label>계약 만료일</label><input id="f-ce" type="date" value="' + (c.end||"") + '"></div>' +
+      '<div class="ff"><label>연락처 (전화번호)</label><input id="f-ph" type="tel" inputmode="tel" value="' + (c.phone||"") + '" placeholder="010-1234-5678"></div>' +
+      '<div class="ff"><label>메모</label><textarea id="f-mo" rows="3" style="border:none;outline:none;font-size:15px;background:transparent;color:#000;font-family:inherit;width:100%;resize:none;">' + (c.memo||"") + '</textarea></div>';
+    body.appendChild(cfc);
+
+    // 호실 그리드 컨테이너 (다가구원룸 선택 시 표시)
+    var roomGridWrap = document.createElement("div");
+    roomGridWrap.id = "room-grid-wrap";
+    roomGridWrap.style.display = "none";
+    body.appendChild(roomGridWrap);
+
+    // 호실 그리드 렌더 함수
+    function renderRoomGrid(prop, selectedRoom) {
+      roomGridWrap.innerHTML = "";
+      var rooms = propRooms(prop);
+      if (!prop || !isMultiRoom(prop) || rooms.length === 0) {
+        roomGridWrap.style.display = "none";
+        return;
+      }
+      roomGridWrap.style.display = "";
+      var hdr = document.createElement("div"); hdr.className = "room-grid-hdr";
+      hdr.textContent = "호실 선택 — " + rooms.length + "호실 중 " + (prop.rentedRooms||0) + "호 임대중";
+      roomGridWrap.appendChild(hdr);
+      var grid = document.createElement("div"); grid.className = "room-grid";
+      // 이미 임대중인 호실 파악
+      var occupiedUnits = {};
+      for (var oci = 0; oci < CONTRACTS.length; oci++) {
+        var oc = CONTRACTS[oci];
+        if (oc.propId !== prop.id) { continue; }
+        if (sheetEditId && oc.id === sheetEditId) { continue; }
+        if (oc.end && new Date(oc.end) < new Date()) { continue; }
+        if (oc.unit) {
+          var unitKey = oc.unit.split(" ")[0];
+          occupiedUnits[unitKey] = oc.unit;
+        }
+      }
+      for (var ri = 0; ri < rooms.length; ri++) {
+        var roomNum = rooms[ri];
+        var roomLabel = roomNum + "호";
+        var isOccupied = !!(occupiedUnits[roomNum] || occupiedUnits[roomLabel]);
+        var occupiedName = occupiedUnits[roomNum] || occupiedUnits[roomLabel] || "";
+        var cell = document.createElement("div");
+        cell.className = "room-cell " + (isOccupied ? "occupied" : "vacant");
+        var isSelected = (!isOccupied && (selectedRoom === roomNum || selectedRoom === roomLabel));
+        if (isSelected) { cell.classList.add("selected"); }
+        var numEl = document.createElement("div"); numEl.className = "room-cell-num"; numEl.textContent = roomLabel;
+        var stEl = document.createElement("div"); stEl.className = "room-cell-status";
+        stEl.textContent = isOccupied ? (occupiedName.replace(roomLabel+" ","").replace(roomNum+" ","") || "임대중") : "공실";
+        cell.appendChild(numEl); cell.appendChild(stEl);
+        if (!isOccupied) {
+          (function(rn, rl, prop2) {
+            cell.addEventListener("click", function() {
+              var cells = grid.querySelectorAll(".room-cell.vacant");
+              for (var ci2 = 0; ci2 < cells.length; ci2++) { cells[ci2].classList.remove("selected"); }
+              cell.classList.add("selected");
+              var tuEl = ge("f-tu");
+              if (tuEl) { tuEl.value = rl + " "; tuEl.focus(); }
+              var depEl = ge("f-cd"); var monEl = ge("f-cm");
+              if (depEl && !depEl.value) { depEl.value = prop2.deposit || ""; }
+              if (monEl && !monEl.value) { monEl.value = prop2.rent || ""; }
+            });
+          })(roomNum, roomLabel, prop);
+        }
+        grid.appendChild(cell);
+      }
+      roomGridWrap.appendChild(grid);
+    }
+
+    // 계약 물건 선택 시 처리
+    var ppSel = ge("f-pp");
+    if (ppSel) {
+      function onPropChange() {
+        var pid = parseInt(ppSel.value) || 0;
+        var selProp = null;
+        for (var pi2 = 0; pi2 < PROPS.length; pi2++) {
+          if (PROPS[pi2].id === pid) { selProp = PROPS[pi2]; break; }
+        }
+        if (selProp && isMultiRoom(selProp)) {
+          renderRoomGrid(selProp, "");
+        } else {
+          roomGridWrap.style.display = "none";
+          // 일반 물건: 보증금·월세 자동 입력
+          if (selProp) {
+            var depEl = ge("f-cd"); var monEl = ge("f-cm");
+            if (depEl) { depEl.value = selProp.deposit || ""; }
+            if (monEl) { monEl.value = totalRent(selProp) || ""; }
+          }
+        }
+      }
+      ppSel.addEventListener("change", onPropChange);
+      // 초기 렌더 (수정 시 현재 물건 그리드 표시)
+      if (PROPS.length > 0) {
+        var initPid = parseInt(ppSel.value) || 0;
+        var initProp = null;
+        for (var ip = 0; ip < PROPS.length; ip++) { if (PROPS[ip].id === initPid) { initProp = PROPS[ip]; break; } }
+        if (initProp && isMultiRoom(initProp)) {
+          var initSelected = c.unit ? c.unit.split(" ")[0] : "";
+          renderRoomGrid(initProp, initSelected);
+        }
+      }
+    }
+    var sb2 = document.createElement("button");
+    sb2.className = "bfull bpri";
+    sb2.textContent = "저장하기";
+    sb2.style.cssText = "margin-top:16px;font-size:18px;padding:17px;";
+    sb2.addEventListener("click", saveContract);
+    var cb2 = document.createElement("button"); cb2.className = "bfull bsec"; cb2.textContent = "취소";
+    cb2.addEventListener("click", closeSheet);
+    body.appendChild(sb2); body.appendChild(cb2);
+  }
+  ge("sov").style.display = "flex";
+}
+
+function closeSheet() { ge("sov").style.display = "none"; }
+
+function saveProperty() {
+  var name = ge("f-nm").value.trim();
+  var price = parseFloat(ge("f-pr").value) || 0;
+  if (!name) { alert("물건명을 입력하세요."); return; }
+  if (!price) { alert("시세/매입가를 입력하세요."); return; }
+  var ptype = ge("f-ty").value;
+  // rooms 배열 수집 (호실 구성기에서)
+  var savedRooms = [];
+  var gridCells = document.querySelectorAll("#rc-grid .rb-cell.on");
+  for (var gi = 0; gi < gridCells.length; gi++) { savedRooms.push(gridCells[gi].dataset.room); }
+  var data = {
+    name: name,
+    type: ptype,
+    loc: ge("f-lc").value.trim() || "–",
+    price: price,
+    deposit: parseFloat(ge("f-dp").value) || 0,
+    rent: parseFloat(ge("f-rt").value) || 0,
+    status: ge("f-st").value,
+    rooms: ptype === "다가구원룸" ? savedRooms : [],
+    totalRooms: ptype === "다가구원룸" ? savedRooms.length : 0,
+    rentedRooms: 0,
+    loanAmt: parseFloat(ge("f-la").value) || 0,
+    loanRate: parseFloat(ge("f-lr").value) || 0
+  };
+  if (sheetEditId) {
+    for (var i = 0; i < PROPS.length; i++) {
+      if (PROPS[i].id === sheetEditId) {
+        for (var k in data) { PROPS[i][k] = data[k]; }
+        break;
+      }
+    }
+  } else {
+    data.id = nextPid++;
+    PROPS.push(data);
+  }
+  saveData(); closeSheet(); renderPortfolio();
+}
+
+function syncPropFromContracts(propId) {
+  // 해당 물건의 유효 계약(만료 안 된 것) 기준으로 보증금·월세·임대방 수 동기화
+  var prop = null;
+  for (var pi = 0; pi < PROPS.length; pi++) { if (PROPS[pi].id === propId) { prop = PROPS[pi]; break; } }
+  if (!prop) { return; }
+  var active = CONTRACTS.filter(function(c) {
+    if (c.propId !== propId) { return false; }
+    if (!c.end) { return true; }
+    return new Date(c.end) >= new Date();
+  });
+  if (active.length === 0) {
+    // 계약 없으면 상태만 공실로
+    prop.status = "공실";
+    return;
+  }
+  // 보증금·월세: 활성 계약들의 합산
+  var totalDep = 0, totalMon = 0;
+  for (var ai = 0; ai < active.length; ai++) {
+    totalDep += active[ai].deposit || 0;
+    totalMon += active[ai].monthly || 0;
+  }
+  prop.deposit = totalDep;
+  if (isMultiRoom(prop)) {
+    // 다가구원룸: 임대방 수 = 활성 계약 수
+    prop.rentedRooms = Math.min(active.length, prop.totalRooms || active.length);
+    prop.rent = active.length > 0 ? Math.round(totalMon / active.length) : 0;
+    prop.status = prop.rentedRooms > 0 ? "임대중" : "공실";
+  } else {
+    prop.rent = totalMon;
+    prop.status = totalMon > 0 ? "임대중" : (totalDep > 0 ? "전세" : "공실");
+  }
+}
+function saveContract() {
+  var unit = ge("f-tu").value.trim();
+  if (!unit) { alert("호수/이름을 입력하세요. 예) 203호 임성환"); return; }
+  var propId = parseInt(ge("f-pp").value) || 0;
+  // 기존 payments 유지 (수정 시)
+  var existPayments = {};
+  if (sheetEditId) {
+    for (var pi3 = 0; pi3 < CONTRACTS.length; pi3++) {
+      if (CONTRACTS[pi3].id === sheetEditId && CONTRACTS[pi3].payments) {
+        existPayments = CONTRACTS[pi3].payments; break;
+      }
+    }
+  }
+  var data = {
+    unit: unit,
+    tenant: unit,
+    propId: propId,
+    type: ge("f-ct").value,
+    deposit: parseFloat(ge("f-cd").value) || 0,
+    monthly: parseFloat(ge("f-cm").value) || 0,
+    start: ge("f-cs").value,
+    end: ge("f-ce").value,
+    phone: (ge("f-ph") ? ge("f-ph").value.trim() : ""),
+    memo: (ge("f-mo") ? ge("f-mo").value.trim() : ""),
+    payments: existPayments
+  };
+  if (sheetEditId) {
+    for (var i = 0; i < CONTRACTS.length; i++) {
+      if (CONTRACTS[i].id === sheetEditId) {
+        for (var k in data) { CONTRACTS[i][k] = data[k]; }
+        break;
+      }
+    }
+  } else {
+    data.id = nextCid++;
+    CONTRACTS.push(data);
+  }
+  // 물건 보증금·월세·임대방 수 자동 동기화
+  if (propId) { syncPropFromContracts(propId); }
+  saveData(); closeSheet(); renderContracts(); renderPortfolio();
+}
+
+// ── CALCULATORS ───────────────────────────────────────────────────
+function calcAuction() {
+  var ap = parseFloat(ge("a-ap").value) || 0;
+  var mn = parseFloat(ge("a-mn").value) || 0;
+  var fail = parseInt(ge("a-fl").value) || 0;
+  var reg = ge("a-rg").value;
+  var rm = {0:0.98,1:0.89,2:0.82,3:0.74,4:0.68};
+  var rb = (reg.indexOf("강남") >= 0) ? 0.03 : (reg.indexOf("기타") >= 0) ? 0.01 : 0;
+  var avg = (rm[Math.min(fail,4)] || 0.74) + rb;
+  var margin = ap * avg - mn;
+  ge("ares").innerHTML =
+    '<div class="rc"><div class="rl">예상 낙찰가 범위</div>' +
+    '<div class="rv">' + fmt(Math.round(ap*(avg-0.05))) + '~' + fmt(Math.round(ap*(avg+0.04))) + '</div>' +
+    '<div class="rsub">만원 · 평균 ' + (avg*100).toFixed(1) + '%</div></div>' +
+    '<div class="lcard" style="margin-bottom:16px;">' +
+    '<div class="rrow"><span class="rk">평균 예상가</span><span class="rv2">' + fmt(Math.round(ap*avg)) + '만원</span></div>' +
+    '<div class="rrow"><span class="rk">최저가 대비 여유</span><span class="rv2" style="color:' + (margin>0?"#34C759":"#FF3B30") + ';">' + (margin>0?"+":"") + fmt(Math.round(margin)) + '만원</span></div>' +
+    '<div class="rrow"><span class="rk">낙찰가율</span><span class="rv2">' + (avg*100).toFixed(1) + '%</span></div></div>' +
+    '<button onclick="goTab(\'portfolio\', true)" style="width:calc(100% - 32px);margin:0 16px 16px;padding:12px;border-radius:12px;font-size:14px;font-weight:500;cursor:pointer;border:0.5px solid rgba(0,0,0,.15);background:#fff;color:#007AFF;display:block;text-align:center;">← 포트폴리오로 돌아가기</button>';
+}
+function calcRent() {
+  var price = parseFloat(ge("r-pr").value) || 0;
+  var dep = parseFloat(ge("r-dp").value) || 0;
+  var area = parseFloat(ge("r-ar").value) || 0;
+  var type = ge("r-tp").value;
+  var reg = ge("r-rg").value;
+  var ym = {"아파트":0.038,"빌라/다세대":0.052,"오피스텔":0.055,"다가구원룸":0.060,"상가":0.062};
+  var ra = (reg.indexOf("강남") >= 0) ? 0.95 : (reg.indexOf("기타") >= 0) ? 0.98 : 1.02;
+  var m = Math.round((price-dep) * (ym[type]||0.045) * ra / 12);
+  var j = Math.round(price * (type==="아파트" ? 0.72 : 0.65));
+  ge("rres").innerHTML =
+    '<div class="rc"><div class="rl">예상 적정 월세 (방당)</div><div class="rv">' + fmt(m) + '만원/월</div>' +
+    '<div class="rsub">㎡당 ' + (area?(m/area).toFixed(1):"–") + '만원</div></div>' +
+    '<div class="lcard" style="margin-bottom:16px;">' +
+    '<div class="rrow"><span class="rk">예상 전세가</span><span class="rv2">' + fmt(j) + '만원</span></div>' +
+    '<div class="rrow"><span class="rk">임대 수익률</span><span class="rv2">' + (price?((m*12/price)*100).toFixed(2)+"%":"–") + '</span></div>' +
+    '<div class="rrow"><span class="rk">시장가 범위</span><span class="rv2">' + fmt(Math.round(m*0.9)) + '~' + fmt(Math.round(m*1.1)) + '만</span></div></div>' +
+    '<button onclick="goTab(\'portfolio\', true)" style="width:calc(100% - 32px);margin:0 16px 16px;padding:12px;border-radius:12px;font-size:14px;font-weight:500;cursor:pointer;border:0.5px solid rgba(0,0,0,.15);background:#fff;color:#007AFF;display:block;text-align:center;">← 포트폴리오로 돌아가기</button>';
+}
+function calcLoan() {
+  var a = parseFloat(ge("l-am").value) || 0;
+  var r = parseFloat(ge("l-rt").value) / 100 / 12;
+  var n = parseInt(ge("l-yr").value) * 12;
+  var method = ge("l-mt").value;
+  var mo, ti;
+  if (method === "equal") { mo = a*10000*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1); ti = mo*n-a*10000; }
+  else if (method === "principal") { mo = a*10000/n+a*10000*r; ti = a*10000*r*(n+1)/2; }
+  else { mo = a*10000*r; ti = mo*n; }
+  ge("lres").innerHTML =
+    '<div class="rc"><div class="rl">월 납입액</div><div class="rv">' + fmt(Math.round(mo/10000)) + '만원/월</div></div>' +
+    '<div class="lcard" style="margin-bottom:16px;">' +
+    '<div class="rrow"><span class="rk">총 이자 부담</span><span class="rv2" style="color:#FF3B30;">' + fmt(Math.round(ti/10000)) + '만원</span></div>' +
+    '<div class="rrow"><span class="rk">총 상환액</span><span class="rv2">' + fmt(a+Math.round(ti/10000)) + '만원</span></div></div>' +
+    '<button onclick="goTab(\'portfolio\', true)" style="width:calc(100% - 32px);margin:0 16px 16px;padding:12px;border-radius:12px;font-size:14px;font-weight:500;cursor:pointer;border:0.5px solid rgba(0,0,0,.15);background:#fff;color:#007AFF;display:block;text-align:center;">← 포트폴리오로 돌아가기</button>';
+}
+function calcTaxAcq() {
+  var price = parseFloat(ge("tx-p").value) || 0;
+  var h = parseInt(ge("tx-h").value);
+  var adj = ge("tx-a").value === "y";
+  var r = h===1 ? (price<=6000?0.01:price<=9000?0.02:0.03) : h===2 ? (adj?0.08:0.01) : (adj?0.12:0.08);
+  var tax = price * r;
+  ge("txres").innerHTML =
+    '<div class="rc"><div class="rl">취득세 (세율 ' + (r*100).toFixed(0) + '%)</div><div class="rv">' + fmt(Math.round(tax*1.2)) + '만원</div></div>' +
+    '<div class="lcard" style="margin-bottom:16px;">' +
+    '<div class="rrow"><span class="rk">취득세</span><span class="rv2">' + fmt(Math.round(tax)) + '만원</span></div>' +
+    '<div class="rrow"><span class="rk">지방교육세</span><span class="rv2">' + fmt(Math.round(tax*0.2)) + '만원</span></div>' +
+    '<div class="rrow"><span class="rk" style="font-weight:700;">합계</span><span class="rv2" style="font-weight:700;">' + fmt(Math.round(tax*1.2)) + '만원</span></div></div>';
+}
+function calcTransfer() {
+  var buy = parseFloat(ge("tr-b").value) || 0;
+  var sell = parseFloat(ge("tr-s").value) || 0;
+  var cost = parseFloat(ge("tr-c").value) || 0;
+  var hold = parseInt(ge("tr-h").value);
+  var homes = parseInt(ge("tr-n").value);
+  var gain = sell - buy - cost;
+  if (homes===1 && hold>=2) { ge("trres").innerHTML='<div class="rc" style="background:#E8F8EF;"><div class="rl" style="color:#1A7A40;">비과세</div><div class="rv" style="color:#1A5C30;font-size:20px;">1세대 1주택 비과세</div></div>'; return; }
+  if (gain<=0) { ge("trres").innerHTML='<div class="rc"><div class="rv" style="font-size:18px;">양도차익 없음</div></div>'; return; }
+  var taxable = Math.max(0, gain-2500);
+  var r = hold<1?0.70:hold<2?0.60:homes>=3?0.60:taxable<=1400?0.06:taxable<=5000?0.15:taxable<=8800?0.24:0.35;
+  var tax = Math.round(taxable*r);
+  ge("trres").innerHTML =
+    '<div class="rc"><div class="rl">양도소득세 (' + (r*100).toFixed(0) + '%) · 지방세 포함</div><div class="rv">' + fmt(Math.round(tax*1.1)) + '만원</div></div>' +
+    '<div class="lcard" style="margin-bottom:16px;">' +
+    '<div class="rrow"><span class="rk">양도차익</span><span class="rv2">' + fmt(gain) + '만원</span></div>' +
+    '<div class="rrow"><span class="rk">기본공제</span><span class="rv2">–2,500만원</span></div>' +
+    '<div class="rrow"><span class="rk">과세표준</span><span class="rv2">' + fmt(taxable) + '만원</span></div></div>';
+}
+function calcIncome() {
+  var rent = parseFloat(ge("in-r").value) || 0;
+  var method = ge("in-m").value;
+  var other = parseFloat(ge("in-o").value) || 0;
+  var taxable = Math.max(0, rent*0.4-400);
+  if (method === "sep") {
+    var tax = Math.round(taxable*0.14);
+    ge("inres").innerHTML = '<div class="rc"><div class="rl">분리과세 (14%) · 지방세 포함</div><div class="rv">' + fmt(Math.round(tax*1.1)) + '만원</div></div>';
+  } else {
+    var r = (taxable+other)<=1400?0.06:(taxable+other)<=5000?0.15:0.24;
+    ge("inres").innerHTML = '<div class="rc"><div class="rl">종합과세 (' + (r*100).toFixed(0) + '%)</div><div class="rv">약 ' + fmt(Math.round(taxable*r*1.1)) + '만원</div><div class="rsub">세무사 확인 권장</div></div>';
+  }
+}
+
+// ── SEGMENTED CONTROLS ────────────────────────────────────────────
+function setupSeg(segId, ids) {
+  var seg = ge(segId);
+  if (!seg) { return; }
+  var items = seg.querySelectorAll(".si");
+  for (var i = 0; i < items.length; i++) {
+    (function(item) {
+      item.addEventListener("click", function() {
+        for (var j = 0; j < items.length; j++) { items[j].classList.remove("on"); }
+        item.classList.add("on");
+        var target = item.getAttribute("data-target");
+        for (var k = 0; k < ids.length; k++) {
+          var s = ge(ids[k]);
+          if (s) { s.style.display = (ids[k] === target) ? "block" : "none"; }
+        }
+      });
+    })(items[i]);
+  }
+}
+
+// ── INIT ──────────────────────────────────────────────────────────
+document.addEventListener("DOMContentLoaded", function() {
+  loadData();
+
+  ge("btn-add").addEventListener("click", function() {
+    if (curTab === "portfolio") { openSheet("property", null); }
+    else if (curTab === "contract") { openSheet("contract", null); }
+  });
+  var btnAddExp = ge("btn-add-exp");
+  if (btnAddExp) { btnAddExp.addEventListener("click", function() { openExpenseSheet("periodic"); }); }
+  var btnAddExpOnce = ge("btn-add-exp-once");
+  if (btnAddExpOnce) { btnAddExpOnce.addEventListener("click", function() { openExpenseSheet("onetime"); }); }
+  ge("btn-shclose").addEventListener("click", closeSheet);
+  ge("sov").addEventListener("click", function(e) { if (e.target === this) { closeSheet(); } });
+
+  var tabs = document.querySelectorAll(".ti");
+  for (var i = 0; i < tabs.length; i++) {
+    (function(t) {
+      t.addEventListener("click", function() { goTab(t.getAttribute("data-tab"), false); });
+    })(tabs[i]);
+  }
+
+  var backBtn = ge("btn-back");
+  if (backBtn) { backBtn.addEventListener("click", goBack); }
+
+  ge("btn-auction").addEventListener("click", calcAuction);
+  ge("btn-rent").addEventListener("click", calcRent);
+  ge("btn-loan").addEventListener("click", calcLoan);
+  ge("btn-tax").addEventListener("click", calcTaxAcq);
+  ge("btn-transfer").addEventListener("click", calcTransfer);
+  ge("btn-income").addEventListener("click", calcIncome);
+
+  setupSeg("cseg", ["cc-rent","cc-loan","cc-tax"]);
+  setupSeg("tseg", ["tc-acq","tc-trf","tc-inc"]);
+
+  var isStandalone = (window.navigator.standalone === true) ||
+    window.matchMedia("(display-mode: standalone)").matches;
+  if (!isStandalone) {
+    var shown = false;
+    try { shown = !!localStorage.getItem("bp_tip"); } catch(e) {}
+    if (!shown) {
+      setTimeout(function() {
+        ge("install-tip").style.display = "block";
+        try { localStorage.setItem("bp_tip","1"); } catch(e) {}
+      }, 3000);
+    }
+  }
+  ge("btn-tip-close").addEventListener("click", function() {
+    ge("install-tip").style.display = "none";
+  });
+
+  ge("btn-add").style.display = "flex";
+  renderPortfolio();
+});
+
+// ── SERVICE WORKER ────────────────────────────────────────────────
+if ("serviceWorker" in navigator) {
+  var swCode = [
+    "var C='bpro3';",
+    "self.addEventListener('install',function(e){self.skipWaiting();});",
+    "self.addEventListener('activate',function(e){",
+    "  e.waitUntil(caches.keys().then(function(ks){",
+    "    return Promise.all(ks.filter(function(k){return k!==C;}).map(function(k){return caches.delete(k);}));",
+    "  }));",
+    "  self.clients.claim();",
+    "});",
+    "self.addEventListener('fetch',function(e){",
+    "  if(e.request.method!=='GET'){return;}",
+    "  e.respondWith(caches.open(C).then(function(cache){",
+    "    return cache.match(e.request).then(function(r){",
+    "      var fresh=fetch(e.request).then(function(res){cache.put(e.request,res.clone());return res;});",
+    "      return r||fresh;",
+    "    });",
+    "  }));",
+    "});"
+  ].join("\n");
+  try {
+    var blob = new Blob([swCode], {type:"application/javascript"});
+    navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(function(){});
+  } catch(e) {}
+}
+</script>
+</body>
+</html>
