@@ -1116,10 +1116,12 @@ function renderContracts() {
 
         // 납부 히스토리 (계약 시작월 ~ 현재월)
         var hist = document.createElement("div"); hist.className = "pay-hist";
-        toggleBtn.addEventListener("click", function() {
-          hist.classList.toggle("open");
-          toggleBtn.textContent = hist.classList.contains("open") ? "납부 내역 접기 ▴" : "납부 내역 보기 ▾";
-        });
+        (function(tBtn, hst) {
+          tBtn.addEventListener("click", function() {
+            hst.classList.toggle("open");
+            tBtn.textContent = hst.classList.contains("open") ? "납부 내역 접기 ▴" : "납부 내역 보기 ▾";
+          });
+        })(toggleBtn, hist);
 
         // 월 목록 생성 (시작월 ~ 현재월, 최대 36개월)
         var months = [];
@@ -1779,20 +1781,37 @@ function renderRentMgr() {
   propOrder.push(0); // 물건 없는 계약
 
   propOrder.forEach(function(pid) {
-    if (!propMap[pid]) { return; }
-    var contracts = propMap[pid];
     var prop = null;
     for (var pi=0; pi<PROPS.length; pi++) { if (PROPS[pi].id===pid) { prop=PROPS[pi]; break; } }
     var propName = prop ? prop.name : "물건 미지정";
 
+    // 다가구원룸: 계약 없는 호실을 공실로 추가
+    var contracts = propMap[pid] ? propMap[pid].slice() : [];
+    var vacantRows = []; // 공실 호실 목록
+    if (prop && isMultiRoom(prop)) {
+      var rooms = propRooms(prop);
+      rooms.forEach(function(roomNum) {
+        var roomLabel = roomNum + "호";
+        var hasContract = false;
+        for (var ci=0; ci<contracts.length; ci++) {
+          var unitKey = (contracts[ci].unit||"").split(" ")[0];
+          if (unitKey === roomNum || unitKey === roomLabel) { hasContract = true; break; }
+        }
+        if (!hasContract) { vacantRows.push(roomLabel); }
+      });
+    }
+
+    if (!contracts.length && !vacantRows.length) { return; }
+
     // 물건 납부 현황 집계
-    var pPaid = 0, pTotal = contracts.length;
+    var pPaid = 0, pTotal = contracts.length + vacantRows.length;
     contracts.forEach(function(c) {
       var s = (c.payments && c.payments[monthKey]) || "none";
       if (s==="paid"||s==="early"||s==="prepaid") { pPaid++; }
     });
     var statClass = pPaid===pTotal ? "all-paid" : pPaid===0 ? "none-paid" : "partial";
-    var statLabel = pPaid===pTotal ? "전액 납부 ✓" : pPaid+"/" + pTotal + " 납부";
+    var statLabel = pPaid + "/" + pTotal + " 납부" + (vacantRows.length > 0 ? " · 공실 " + vacantRows.length + "호" : "");
+    if (pPaid===pTotal && vacantRows.length===0) { statLabel = "전액 납부 ✓"; }
 
     var card = document.createElement("div"); card.className = "rm-prop-card";
 
@@ -1910,6 +1929,23 @@ function renderRentMgr() {
       })(c.id, monthKey, payBtn, stat, stat);
 
       row.appendChild(nameEl); row.appendChild(amtEl); row.appendChild(payBtn);
+      card.appendChild(row);
+    });
+
+    // 공실 호실 행 추가
+    vacantRows.forEach(function(roomLabel) {
+      var row = document.createElement("div"); row.className = "rm-tenant-row";
+      var nameEl = document.createElement("div"); nameEl.className = "rm-tenant-name";
+      nameEl.innerHTML = roomLabel + '<span style="font-size:11px;color:#AEAEB2;margin-left:5px;">공실</span>';
+      var amtEl = document.createElement("div"); amtEl.className = "rm-tenant-amt";
+      amtEl.style.color = "#AEAEB2";
+      amtEl.textContent = "0만";
+      var vacBtn = document.createElement("button");
+      vacBtn.className = "rm-pay-btn s-none";
+      vacBtn.textContent = "공실";
+      vacBtn.disabled = true;
+      vacBtn.style.opacity = "0.5";
+      row.appendChild(nameEl); row.appendChild(amtEl); row.appendChild(vacBtn);
       card.appendChild(row);
     });
 
