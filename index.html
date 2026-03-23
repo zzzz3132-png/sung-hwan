@@ -759,7 +759,14 @@ function goTab(id, pushHistory) {
   var rmBar = ge("rm-fixed-bar");
   if (rmBar) { rmBar.style.display = (id === "rentmgr") ? "block" : "none"; }
   var scrollEl = ge("scroll");
-  if (scrollEl) { scrollEl.scrollTop = 0; }
+  if (scrollEl) {
+    scrollEl.scrollTop = 0;
+    if (id === "rentmgr") {
+      scrollEl.style.paddingBottom = "0";
+    } else {
+      scrollEl.style.paddingBottom = "";
+    }
+  }
   ge("ptitle").textContent = TAB_TITLES[id] || id;
   curTab = id;
   pendingDel = null;
@@ -1761,6 +1768,12 @@ function renderRentMgr() {
   var now = new Date();
 
   // rm-list 높이를 화면에 맞게 계산
+  // 이전 JS가 남긴 인라인 스타일 완전 초기화
+  var rl0 = ge("rm-list");
+  if (rl0) {
+    rl0.removeAttribute("style");
+    rl0.style.paddingBottom = "200px";
+  }
   var sc = ge("scroll"); if (sc) { sc.scrollTop = 0; }
 
   // 월 네비게이션
