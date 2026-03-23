@@ -17,7 +17,7 @@ html,body{height:100%;background:#F2F2F7;font-family:-apple-system,BlinkMacSyste
 #btn-add{width:30px;height:30px;border-radius:50%;background:#E5F0FF;border:none;color:#007AFF;font-size:22px;line-height:1;cursor:pointer;display:none;align-items:center;justify-content:center;}
 #btn-back{display:none;align-items:center;gap:3px;background:transparent;border:none;color:#007AFF;font-size:15px;font-weight:500;cursor:pointer;padding:0;min-width:60px;}
 #btn-back svg{width:10px;height:16px;flex-shrink:0;}
-#scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 90px);}
+#scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 140px);}
 #scroll::-webkit-scrollbar{display:none;}
 #tabbar{background:#fff;border-top:0.5px solid rgba(0,0,0,.15);display:flex;align-items:flex-start;padding-top:6px;padding-bottom:env(safe-area-inset-bottom,0px);flex-shrink:0;position:sticky;bottom:0;z-index:100;}
 #tabbar::-webkit-scrollbar{display:none;}
@@ -443,7 +443,7 @@ html,body{height:100%;background:#F2F2F7;font-family:-apple-system,BlinkMacSyste
     <div class="pnl" id="pnl-rentmgr">
       <div id="rm-month-nav" class="rm-month-nav"></div>
       <div id="rm-summary" class="rm-summary-bar"></div>
-      <div id="rm-list"></div>
+      <div id="rm-list" style="padding-bottom:20px;"></div>
     </div>
 
   </div>
@@ -1734,6 +1734,9 @@ function renderRentMgr() {
   var MONTHS_KR = ["1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월"];
   var now = new Date();
 
+  // 항상 맨 위로 스크롤
+  var sc = ge("scroll"); if (sc) { sc.scrollTop = 0; }
+
   // 월 네비게이션
   var nav = ge("rm-month-nav");
   nav.innerHTML = "";
@@ -1974,18 +1977,74 @@ function renderRentMgr() {
       earlyBtn.textContent = "⚡조기";
       btnWrap.appendChild(payBtn); btnWrap.appendChild(earlyBtn);
 
-      (function(cid, mk, btn, earlyBtn2, statEl, hdrStatEl) {
-        // 조기납부 버튼
+      (function(cid, mk, btn, earlyBtn2, statEl, hdrStatEl, rowEl) {
+        // 조기납부 버튼 - 이후 12월까지 월 선택 팝업
         earlyBtn2.addEventListener("click", function(e) {
           e.stopPropagation();
-          for(var ci=0;ci<CONTRACTS.length;ci++){
-            if(CONTRACTS[ci].id!==cid){continue;}
-            if(!CONTRACTS[ci].payments){CONTRACTS[ci].payments={};}
-            CONTRACTS[ci].payments[mk]="early";
-            btn.className="rm-pay-btn s-early"; btn.textContent="⚡조기";
-            saveData(); renderContracts();
-            break;
+          var existPicker = rowEl.nextSibling;
+          if (existPicker && existPicker.classList && existPicker.classList.contains("rm-early-picker")) {
+            existPicker.parentNode.removeChild(existPicker);
+            return;
           }
+          var picker = document.createElement("div");
+          picker.className = "rm-early-picker";
+          picker.style.cssText = "background:#E5F0FF;padding:10px 14px;border-top:0.5px solid rgba(0,122,255,.2);";
+          var ptitle = document.createElement("div");
+          ptitle.style.cssText = "font-size:11px;font-weight:600;color:#007AFF;margin-bottom:8px;";
+          ptitle.textContent = "선납할 월 선택 (복수 가능)";
+          picker.appendChild(ptitle);
+          var pgrid = document.createElement("div");
+          pgrid.style.cssText = "display:flex;flex-wrap:wrap;gap:6px;";
+          var curYear3 = parseInt(mk.split("-")[0]);
+          var curMon3 = parseInt(mk.split("-")[1]) - 1;
+          var selectedMonths = [];
+          var contr3 = null;
+          for (var ci3=0;ci3<CONTRACTS.length;ci3++){ if(CONTRACTS[ci3].id===cid){contr3=CONTRACTS[ci3];break;} }
+          for (var fi = curMon3 + 1; fi <= 11; fi++) {
+            var fk = curYear3 + "-" + (fi + 1);
+            var fLbl = (fi + 1) + "월";
+            var fStatus = (contr3 && contr3.payments && contr3.payments[fk]) || "none";
+            var mBtn = document.createElement("button");
+            mBtn.style.cssText = "padding:5px 12px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid #007AFF;background:#fff;color:#007AFF;";
+            mBtn.textContent = fLbl;
+            if (fStatus==="paid"||fStatus==="prepaid"||fStatus==="early") {
+              mBtn.style.opacity="0.4"; mBtn.style.cursor="default"; mBtn.disabled=true;
+              mBtn.textContent += " ✓";
+            } else {
+              mBtn.dataset.key = fk;
+              mBtn.addEventListener("click", function() {
+                var idx2 = selectedMonths.indexOf(this.dataset.key);
+                if (idx2 >= 0) {
+                  selectedMonths.splice(idx2, 1);
+                  this.style.background="#fff"; this.style.color="#007AFF";
+                } else {
+                  selectedMonths.push(this.dataset.key);
+                  this.style.background="#007AFF"; this.style.color="#fff";
+                }
+                confirmBtn.textContent = selectedMonths.length>0 ? selectedMonths.length+"개월 선납 확인" : "확인";
+              });
+            }
+            pgrid.appendChild(mBtn);
+          }
+          picker.appendChild(pgrid);
+          var confirmBtn = document.createElement("button");
+          confirmBtn.style.cssText = "margin-top:8px;width:100%;padding:9px;border-radius:8px;border:none;background:#007AFF;color:#fff;font-size:13px;font-weight:600;cursor:pointer;";
+          confirmBtn.textContent = "확인";
+          confirmBtn.addEventListener("click", function() {
+            for(var ci=0;ci<CONTRACTS.length;ci++){
+              if(CONTRACTS[ci].id!==cid){continue;}
+              if(!CONTRACTS[ci].payments){CONTRACTS[ci].payments={};}
+              CONTRACTS[ci].payments[mk]="early";
+              for(var si=0;si<selectedMonths.length;si++){
+                CONTRACTS[ci].payments[selectedMonths[si]]="prepaid";
+              }
+              btn.className="rm-pay-btn s-early"; btn.textContent="⚡조기";
+              saveData(); picker.parentNode.removeChild(picker); renderRentMgr();
+              break;
+            }
+          });
+          picker.appendChild(confirmBtn);
+          rowEl.parentNode.insertBefore(picker, rowEl.nextSibling);
         });
         btn.addEventListener("click", function() {
           for (var ci=0; ci<CONTRACTS.length; ci++) {
@@ -1996,7 +2055,7 @@ function renderRentMgr() {
             CONTRACTS[ci].payments[mk] = next;
             btn.className = "rm-pay-btn s-" + next;
             btn.textContent = next==="paid"?"✓납부":next==="unpaid"?"✗미납":"미확인";
-            saveData(); renderContracts();
+            saveData(); renderContracts();saveData(); renderContracts();
             saveData();
             // 물건 헤더 통계 업데이트
             var newPaid = 0;
@@ -2033,7 +2092,7 @@ function renderRentMgr() {
             break;
           }
         });
-      })(c.id, monthKey, payBtn, earlyBtn, stat, stat);
+      })(c.id, monthKey, payBtn, earlyBtn, stat, stat, row);
 
       row.appendChild(nameEl); row.appendChild(amtEl); row.appendChild(btnWrap);
       body.appendChild(row);
