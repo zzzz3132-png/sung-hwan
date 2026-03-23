@@ -296,10 +296,6 @@ html,body{height:100%;background:#F2F2F7;font-family:-apple-system,BlinkMacSyste
 <body>
 <div id="app">
 
-  <div id="rm-fixed-bar" style="display:none;background:#fff;position:relative;z-index:60;box-shadow:0 1px 4px rgba(0,0,0,.08);">
-    <div id="rm-month-nav" class="rm-month-nav" style="position:relative;top:auto;z-index:auto;"></div>
-    <div id="rm-summary" class="rm-summary-bar" style="position:relative;top:auto;z-index:auto;"></div>
-  </div>
   <div id="hdr">
     <button id="btn-back">
       <svg viewBox="0 0 10 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -309,6 +305,12 @@ html,body{height:100%;background:#F2F2F7;font-family:-apple-system,BlinkMacSyste
     </button>
     <span class="hdr-title" id="ptitle">포트폴리오</span>
     <button id="btn-add">+</button>
+  </div>
+
+  <!-- 월세관리 고정 바: hdr 아래, scroll 위 -->
+  <div id="rm-fixed-bar" style="display:none;">
+    <div id="rm-month-nav" class="rm-month-nav"></div>
+    <div id="rm-summary" class="rm-summary-bar"></div>
   </div>
 
   <div id="scroll">
@@ -754,8 +756,8 @@ function goTab(id, pushHistory) {
   for (var j = 0; j < panels.length; j++) { panels[j].classList.remove("on"); }
   ge("pnl-" + id).classList.add("on");
   // rentmgr 고정 바 표시/숨김
-  var rmFixedBar = ge("rm-fixed-bar");
-  if (rmFixedBar) { rmFixedBar.style.display = (id === "rentmgr") ? "block" : "none"; }
+  var rmBar = ge("rm-fixed-bar");
+  if (rmBar) { rmBar.style.display = (id === "rentmgr") ? "block" : "none"; }
   // 탭 전환 시 스크롤 맨 위로
   var scrollEl = ge("scroll");
   if (scrollEl) { scrollEl.scrollTop = 0; }
@@ -1759,7 +1761,7 @@ function renderRentMgr() {
   var MONTHS_KR = ["1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월"];
   var now = new Date();
 
-  // 항상 맨 위로 스크롤, 모든 카드 접힘 상태로 리셋
+  // 항상 맨 위로 스크롤
   var sc = ge("scroll"); if (sc) { sc.scrollTop = 0; }
 
   // 월 네비게이션
