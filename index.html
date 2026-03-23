@@ -171,10 +171,10 @@ html,body{height:100%;background:#F2F2F7;font-family:-apple-system,BlinkMacSyste
 .rm-pay-btn.s-early{background:#E5F0FF;color:#0055CC;}
 .rm-pay-btn.s-prepaid{background:#E8F8EF;color:#1A7A40;}
 .rm-pay-btn.s-unpaid{background:#FFEBEA;color:#B91C1C;}
-.rm-month-nav{display:flex;align-items:center;justify-content:space-between;padding:10px 16px 4px;}
+.rm-month-nav{display:flex;align-items:center;justify-content:space-between;padding:10px 16px 4px;background:#fff;position:sticky;top:0;z-index:50;border-bottom:0.5px solid rgba(0,0,0,.08);}
 .rm-month-label{font-size:15px;font-weight:700;color:#007AFF;}
 .rm-nav-btn{background:transparent;border:0.5px solid rgba(0,122,255,.4);border-radius:8px;padding:4px 12px;font-size:13px;color:#007AFF;cursor:pointer;}
-.rm-summary-bar{display:flex;gap:0;padding:10px 16px;margin:0 16px 10px;background:#F8F8F8;border-radius:10px;}
+.rm-summary-bar{display:flex;gap:0;padding:10px 16px;margin:0;background:#F8F8F8;position:sticky;top:46px;z-index:49;border-bottom:0.5px solid rgba(0,0,0,.06);}
 .rm-sum-item{flex:1;text-align:center;}
 .rm-sum-lbl{font-size:10px;color:#8E8E93;margin-bottom:2px;}
 .rm-sum-val{font-size:15px;font-weight:700;}
@@ -751,6 +751,9 @@ function goTab(id, pushHistory) {
   var panels = document.querySelectorAll(".pnl");
   for (var j = 0; j < panels.length; j++) { panels[j].classList.remove("on"); }
   ge("pnl-" + id).classList.add("on");
+  // 탭 전환 시 스크롤 맨 위로
+  var scrollEl = ge("scroll");
+  if (scrollEl) { scrollEl.scrollTop = 0; }
   ge("ptitle").textContent = TAB_TITLES[id] || id;
   curTab = id;
   pendingDel = null;
@@ -1197,15 +1200,26 @@ function renderContracts() {
       var uBdg = document.createElement("span"); uBdg.className = "bdg "+st.c; uBdg.textContent = st.l;
       uRight.appendChild(uAmt);
       uRight.appendChild(uBdg);
-      unitRow.appendChild(uLeft); unitRow.appendChild(uRight);
+      // 납부 내역 버튼 (unitRow 오른쪽)
+      var histBtn = document.createElement("div");
+      histBtn.style.cssText = "font-size:10px;color:#007AFF;font-weight:600;padding:3px 8px;border:0.5px solid rgba(0,122,255,.3);border-radius:6px;cursor:pointer;white-space:nowrap;margin-left:6px;flex-shrink:0;";
+      histBtn.textContent = "내역 ▾";
+      unitRow.appendChild(uLeft); unitRow.appendChild(uRight); unitRow.appendChild(histBtn);
 
       // 상세 - 탭하면 토글
       var detail = document.createElement("div");
       detail.style.cssText = "display:none;background:#FAFAFA;border-top:0.5px solid rgba(0,0,0,.06);";
       var detailOpen = false;
-      unitRow.addEventListener("click", function() {
+      unitRow.addEventListener("click", function(e) {
+        if (e.target === histBtn || histBtn.contains(e.target)) { return; } // histBtn은 별도 처리
         detailOpen = !detailOpen;
         detail.style.display = detailOpen ? "block" : "none";
+      });
+      histBtn.addEventListener("click", function(e) {
+        e.stopPropagation();
+        detailOpen = !detailOpen;
+        detail.style.display = detailOpen ? "block" : "none";
+        histBtn.textContent = detailOpen ? "내역 ▴" : "내역 ▾";
       });
 
       // ── 납부 히스토리 (정기/지연/미납 구분) ───────────────────
@@ -1225,7 +1239,7 @@ function renderContracts() {
 
         // 납부 내역 보기 토글
         var histToggle = document.createElement("div");
-        histToggle.style.cssText = "padding:8px 16px;font-size:12px;color:#007AFF;cursor:pointer;font-weight:600;border-top:0.5px solid rgba(0,0,0,.06);";
+        histToggle.style.cssText = "padding:8px 16px;font-size:12px;color:#007AFF;cursor:pointer;font-weight:600;border-top:0.5px solid rgba(0,0,0,.06);text-align:right;";
         histToggle.textContent = "납부 내역 보기 ▾";
         var histBox = document.createElement("div"); histBox.style.display = "none";
         var histOpen = false;
