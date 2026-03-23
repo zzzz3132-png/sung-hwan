@@ -171,10 +171,10 @@ html,body{height:100%;background:#F2F2F7;font-family:-apple-system,BlinkMacSyste
 .rm-pay-btn.s-early{background:#E5F0FF;color:#0055CC;}
 .rm-pay-btn.s-prepaid{background:#E8F8EF;color:#1A7A40;}
 .rm-pay-btn.s-unpaid{background:#FFEBEA;color:#B91C1C;}
-.rm-month-nav{display:flex;align-items:center;justify-content:space-between;padding:10px 16px 4px;background:#fff;position:sticky;top:0;z-index:50;border-bottom:0.5px solid rgba(0,0,0,.08);}
+.rm-month-nav{display:flex;align-items:center;justify-content:space-between;padding:8px 16px;background:#fff;position:sticky;top:0;z-index:50;border-bottom:0.5px solid rgba(0,0,0,.08);}
 .rm-month-label{font-size:15px;font-weight:700;color:#007AFF;}
 .rm-nav-btn{background:transparent;border:0.5px solid rgba(0,122,255,.4);border-radius:8px;padding:4px 12px;font-size:13px;color:#007AFF;cursor:pointer;}
-.rm-summary-bar{display:flex;gap:0;padding:10px 16px;margin:0;background:#F8F8F8;position:sticky;top:46px;z-index:49;border-bottom:0.5px solid rgba(0,0,0,.06);}
+.rm-summary-bar{display:flex;gap:0;padding:8px 16px;margin:0;background:#F8F8F8;position:sticky;top:44px;z-index:49;border-bottom:0.5px solid rgba(0,0,0,.06);}
 .rm-sum-item{flex:1;text-align:center;}
 .rm-sum-lbl{font-size:10px;color:#8E8E93;margin-bottom:2px;}
 .rm-sum-val{font-size:15px;font-weight:700;}
@@ -443,7 +443,7 @@ html,body{height:100%;background:#F2F2F7;font-family:-apple-system,BlinkMacSyste
     <div class="pnl" id="pnl-rentmgr">
       <div id="rm-month-nav" class="rm-month-nav"></div>
       <div id="rm-summary" class="rm-summary-bar"></div>
-      <div id="rm-list" style="padding-bottom:20px;"></div>
+      <div id="rm-list" style="padding-bottom:160px;"></div>
     </div>
 
   </div>
@@ -1889,9 +1889,7 @@ function renderRentMgr() {
 
     // 호실 목록 (기본: 접힘)
     var body = document.createElement("div"); body.className = "rm-prop-body";
-    // 첫 번째 물건은 기본 펼침
-    if (listEl.children.length === 0) { body.classList.add("open"); arrow.textContent = "▴"; }
-
+    // 기본 접힘 (클릭해야 펼침)
     hdr.addEventListener("click", function() {
       body.classList.toggle("open");
       arrow.textContent = body.classList.contains("open") ? "▴" : "▾";
@@ -2007,23 +2005,28 @@ function renderRentMgr() {
             var mBtn = document.createElement("button");
             mBtn.style.cssText = "padding:5px 12px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid #007AFF;background:#fff;color:#007AFF;";
             mBtn.textContent = fLbl;
+            mBtn.dataset.key = fk;
             if (fStatus==="paid"||fStatus==="prepaid"||fStatus==="early") {
-              mBtn.style.opacity="0.4"; mBtn.style.cursor="default"; mBtn.disabled=true;
+              mBtn.style.background="#E8F8EF"; mBtn.style.color="#1A7A40";
+              mBtn.style.borderColor="#34C759";
               mBtn.textContent += " ✓";
-            } else {
-              mBtn.dataset.key = fk;
-              mBtn.addEventListener("click", function() {
-                var idx2 = selectedMonths.indexOf(this.dataset.key);
-                if (idx2 >= 0) {
-                  selectedMonths.splice(idx2, 1);
-                  this.style.background="#fff"; this.style.color="#007AFF";
-                } else {
-                  selectedMonths.push(this.dataset.key);
-                  this.style.background="#007AFF"; this.style.color="#fff";
-                }
-                confirmBtn.textContent = selectedMonths.length>0 ? selectedMonths.length+"개월 선납 확인" : "확인";
-              });
             }
+            mBtn.addEventListener("click", function() {
+              var idx2 = selectedMonths.indexOf(this.dataset.key);
+              if (idx2 >= 0) {
+                selectedMonths.splice(idx2, 1);
+                var origStatus = (contr3&&contr3.payments&&contr3.payments[this.dataset.key])||"none";
+                if(origStatus==="paid"||origStatus==="prepaid"||origStatus==="early"){
+                  this.style.background="#E8F8EF"; this.style.color="#1A7A40"; this.style.borderColor="#34C759";
+                } else {
+                  this.style.background="#fff"; this.style.color="#007AFF"; this.style.borderColor="#007AFF";
+                }
+              } else {
+                selectedMonths.push(this.dataset.key);
+                this.style.background="#007AFF"; this.style.color="#fff"; this.style.borderColor="#007AFF";
+              }
+              confirmBtn.textContent = selectedMonths.length>0 ? selectedMonths.length+"개월 납부 처리" : "확인";
+            });
             pgrid.appendChild(mBtn);
           }
           picker.appendChild(pgrid);
