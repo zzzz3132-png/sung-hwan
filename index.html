@@ -1191,17 +1191,11 @@ function renderContracts() {
       uAmt.textContent = c.monthly ? fmt(c.monthly)+"만/월" : "전세";
       if (c.deposit) {
         var uDep = document.createElement("div"); uDep.style.cssText="font-size:11px;color:#5856D6;font-weight:500;";
-        uDep.textContent = "보증 "+fmt(c.deposit)+"만";
+        uDep.textContent = "보증금 "+fmt(c.deposit)+"만";
         uRight.appendChild(uDep);
       }
       var uBdg = document.createElement("span"); uBdg.className = "bdg "+st.c; uBdg.textContent = st.l;
       uRight.appendChild(uAmt);
-      if (c.deposit) {
-        var uDep = document.createElement("div");
-        uDep.style.cssText = "font-size:11px;color:#5856D6;font-weight:500;margin-top:2px;";
-        uDep.textContent = "보증금 "+fmt(c.deposit)+"만";
-        uRight.appendChild(uDep);
-      }
       uRight.appendChild(uBdg);
       unitRow.appendChild(uLeft); unitRow.appendChild(uRight);
 
