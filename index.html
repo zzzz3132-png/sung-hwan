@@ -1747,41 +1747,50 @@ function renderRentMgr() {
     return true;
   });
 
-  // 전체 요약
-  var totalPaid = 0, totalUnpaid = 0, totalAmt = 0, totalNone = 0;
+  // 요약: 건물별 집계 (공실 포함) - 렌더 후 갱신
+  var totalPaid = 0, totalUnpaid = 0, totalAmt = 0;
+  var cntPaid = 0, cntUnpaid = 0, cntVacant = 0, cntUnconfirmed = 0;
+  var nowMs = new Date();
+
+  // 공실 수 집계 (다가구원룸 기준)
+  PROPS.forEach(function(prop) {
+    if (!isMultiRoom(prop)) { return; }
+    var rooms = propRooms(prop);
+    rooms.forEach(function(roomNum) {
+      var roomLabel = roomNum + "호";
+      var hasContract = activeContracts.some(function(c) {
+        if (c.propId !== prop.id) { return false; }
+        var uk = (c.unit||"").split(" ")[0];
+        return uk===roomNum||uk===roomLabel;
+      });
+      if (!hasContract) { cntVacant++; }
+    });
+  });
+
   activeContracts.forEach(function(c) {
     var s = (c.payments && c.payments[monthKey]) || "none";
     totalAmt += c.monthly || 0;
-    if (s === "paid" || s === "early" || s === "prepaid") { totalPaid += c.monthly || 0; }
-    else if (s === "unpaid") { totalUnpaid += c.monthly || 0; }
-    else { totalNone += c.monthly || 0; }
+    var payDay = c.start ? new Date(c.start).getDate() : 1;
+    var dueDate = new Date(nowMs.getFullYear(), nowMs.getMonth(), payDay);
+    if (s==="paid"||s==="early"||s==="prepaid") {
+      cntPaid++; totalPaid += c.monthly || 0;
+    } else if (s==="unpaid") {
+      cntUnpaid++; totalUnpaid += c.monthly || 0;
+    } else if (s==="none" && nowMs > dueDate) {
+      cntUnconfirmed++;
+    }
   });
 
-  // 가구수 집계
-  var cntPaid = 0, cntUnpaid = 0, cntNone = 0;
-  activeContracts.forEach(function(c) {
-    var s = (c.payments && c.payments[monthKey]) || "none";
-    if (s==="paid"||s==="early"||s==="prepaid") { cntPaid++; }
-    else if (s==="unpaid") { cntUnpaid++; }
-    else { cntNone++; }
-  });
-
-  // 미확인: 납부일 지났는데 미기록인 건
-  var cntUnconfirmed = 0;
-  var now3s = new Date();
-  activeContracts.forEach(function(c) {
-    var s3s = (c.payments && c.payments[monthKey]) || "none";
-    var pd3s = c.start ? new Date(c.start).getDate() : 1;
-    var dd3s = new Date(now3s.getFullYear(), now3s.getMonth(), pd3s);
-    if (s3s==="none" && now3s > dd3s) { cntUnconfirmed++; }
-  });
   var sumEl = ge("rm-summary");
-  sumEl.innerHTML =
-    '<div class="rm-sum-item"><div class="rm-sum-lbl">납부완료 <span style="color:#1A7A40;font-weight:700;">' + cntPaid + '가구</span></div><div class="rm-sum-val" style="color:#1A7A40;">+' + fmt(totalPaid) + '만</div></div>' +
-    '<div class="rm-sum-item"><div class="rm-sum-lbl">미납 <span style="color:#B91C1C;font-weight:700;">' + cntUnpaid + '가구</span></div><div class="rm-sum-val" style="color:#B91C1C;">' + (totalUnpaid?"-"+fmt(totalUnpaid):"–") + '만</div></div>' +
-    (cntUnconfirmed>0?'<div class="rm-sum-item"><div class="rm-sum-lbl">미확인 <span style="color:#FF9500;font-weight:700;">'+cntUnconfirmed+'가구</span></div><div class="rm-sum-val" style="color:#FF9500;">확인필요</div></div>':'')+
-    '<div class="rm-sum-item"><div class="rm-sum-lbl">공실 <span style="color:#AEAEB2;font-weight:700;">' + cntNone + '가구</span></div><div class="rm-sum-val" style="color:#AEAEB2;">0만</div></div>' +
-    '<div class="rm-sum-item"><div class="rm-sum-lbl">전체</div><div class="rm-sum-val">' + fmt(totalAmt) + '만</div></div>';
+  function updateSummaryBar() {
+    sumEl.innerHTML =
+      '<div class="rm-sum-item"><div class="rm-sum-lbl">납부완료 <span style="color:#1A7A40;font-weight:700;">' + cntPaid + '가구</span></div><div class="rm-sum-val" style="color:#1A7A40;">+' + fmt(totalPaid) + '만</div></div>' +
+      '<div class="rm-sum-item"><div class="rm-sum-lbl">미납 <span style="color:#B91C1C;font-weight:700;">' + cntUnpaid + '가구</span></div><div class="rm-sum-val" style="color:#B91C1C;">' + (totalUnpaid?"-"+fmt(totalUnpaid):"–") + '만</div></div>' +
+      (cntUnconfirmed>0?'<div class="rm-sum-item"><div class="rm-sum-lbl">미확인 <span style="color:#FF9500;font-weight:700;">'+cntUnconfirmed+'가구</span></div><div class="rm-sum-val" style="color:#FF9500;">확인필요</div></div>':'')+
+      '<div class="rm-sum-item"><div class="rm-sum-lbl">공실 <span style="color:#AEAEB2;font-weight:700;">' + cntVacant + '호</span></div><div class="rm-sum-val" style="color:#AEAEB2;">0만</div></div>' +
+      '<div class="rm-sum-item"><div class="rm-sum-lbl">전체</div><div class="rm-sum-val">' + fmt(totalAmt) + '만</div></div>';
+  }
+  updateSummaryBar();
 
   // 물건별 그룹핑
   var listEl = ge("rm-list"); listEl.innerHTML = "";
@@ -1799,18 +1808,19 @@ function renderRentMgr() {
     propMap[pid].push(c);
   });
 
-  // 물건 순서대로 렌더
+  // 물건 순서대로 렌더 (계약 있는 물건만)
   var propOrder = PROPS.map(function(p){ return p.id; });
-  propOrder.push(0); // 물건 없는 계약
+  propOrder.push(0);
 
   propOrder.forEach(function(pid) {
     var prop = null;
     for (var pi=0; pi<PROPS.length; pi++) { if (PROPS[pi].id===pid) { prop=PROPS[pi]; break; } }
     var propName = prop ? prop.name : "물건 미지정";
 
-    // 다가구원룸: 계약 없는 호실을 공실로 추가
     var contracts = propMap[pid] ? propMap[pid].slice() : [];
-    var vacantRows = []; // 공실 호실 목록
+    var vacantRows = [];
+
+    // 다가구원룸만 공실 호실 추가
     if (prop && isMultiRoom(prop)) {
       var rooms = propRooms(prop);
       rooms.forEach(function(roomNum) {
@@ -1824,10 +1834,12 @@ function renderRentMgr() {
       });
     }
 
-    // 계약도 없고 공실도 없으면 스킵 (단, PROPS에 있는 물건은 빈 카드라도 표시)
-    if (!contracts.length && !vacantRows.length && !prop) { return; }
-    if (!contracts.length && !vacantRows.length) { vacantRows = prop ? ["(계약 없음)"] : []; }
+    // 계약도 없고 공실도 없으면 스킵
     if (!contracts.length && !vacantRows.length) { return; }
+
+    // 전세/아파트: 납부 현황 없이 전세 표시만
+    var isJeonse = prop && !isMultiRoom(prop) && contracts.length > 0 &&
+      contracts.every(function(c){ return !c.monthly || c.monthly===0; });
 
     // 물건 납부 현황 집계
     var pPaid = 0, pTotal = contracts.length + vacantRows.length;
@@ -1835,9 +1847,14 @@ function renderRentMgr() {
       var s = (c.payments && c.payments[monthKey]) || "none";
       if (s==="paid"||s==="early"||s==="prepaid") { pPaid++; }
     });
-    var statClass = pPaid===pTotal ? "all-paid" : pPaid===0 ? "none-paid" : "partial";
-    var statLabel = pPaid + "/" + pTotal + " 납부" + (vacantRows.length > 0 ? " · 공실 " + vacantRows.length + "호" : "");
-    if (pPaid===pTotal && vacantRows.length===0) { statLabel = "전액 납부 ✓"; }
+    var statClass, statLabel;
+    if (isJeonse) {
+      statClass = "partial"; statLabel = "전세";
+    } else {
+      statClass = pPaid===pTotal ? "all-paid" : pPaid===0 ? "none-paid" : "partial";
+      statLabel = pPaid + "/" + pTotal + " 납부" + (vacantRows.length > 0 ? " · 공실 " + vacantRows.length + "호" : "");
+      if (pPaid===pTotal && vacantRows.length===0) { statLabel = "전액 납부 ✓"; }
+    }
 
     var card = document.createElement("div"); card.className = "rm-prop-card";
 
@@ -1867,6 +1884,20 @@ function renderRentMgr() {
     contracts.forEach(function(c) {
       var s = (c.payments && c.payments[monthKey]) || "none";
       var row = document.createElement("div"); row.className = "rm-tenant-row";
+
+      // 전세: 납부 현황 없이 이름+전세 표시만
+      if (isJeonse) {
+        var jtNameEl = document.createElement("div"); jtNameEl.className = "rm-tenant-name";
+        jtNameEl.textContent = c.unit || c.tenant;
+        var jtBdg = document.createElement("span"); jtBdg.style.cssText="font-size:11px;color:#007AFF;margin-left:6px;font-weight:600;";
+        jtBdg.textContent = "전세";
+        jtNameEl.appendChild(jtBdg);
+        var jtAmt = document.createElement("div"); jtAmt.className = "rm-tenant-amt";
+        jtAmt.textContent = c.deposit ? fmt(c.deposit)+"만" : "–";
+        row.appendChild(jtNameEl); row.appendChild(jtAmt);
+        body.appendChild(row);
+        return;
+      }
 
       // 납부일
       var payDay = c.start ? new Date(c.start).getDate() : 1;
