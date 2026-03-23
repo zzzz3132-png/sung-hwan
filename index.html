@@ -122,6 +122,38 @@ html,body{height:100%;background:#F2F2F7;font-family:-apple-system,BlinkMacSyste
 .rec-amt{font-size:13px;font-weight:600;min-width:60px;text-align:right;}
 .rec-del{background:transparent;border:0.5px solid rgba(0,0,0,.12);border-radius:6px;color:#FF3B30;font-size:11px;padding:3px 7px;cursor:pointer;}
 .rm-prop-card{background:#fff;border-radius:14px;margin:0 16px 14px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.07);}
+.rm-prop-body{display:none;}
+.rm-prop-body.open{display:block;}
+.rm-prop-hdr{cursor:pointer;}
+.rm-toggle-arrow{font-size:12px;color:#AEAEB2;margin-left:6px;transition:none;}
+.ct-prop-card{background:#fff;border-radius:14px;margin:0 16px 12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+.ct-prop-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;border-bottom:0.5px solid rgba(0,0,0,.06);}
+.ct-prop-hdr:active{background:#F8F8F8;}
+.ct-prop-name{font-size:16px;font-weight:700;}
+.ct-prop-meta{font-size:12px;color:#8E8E93;margin-top:2px;}
+.ct-prop-right{display:flex;align-items:center;gap:8px;}
+.ct-prop-cnt{font-size:12px;font-weight:600;padding:3px 10px;border-radius:99px;background:#E5F0FF;color:#007AFF;}
+.ct-prop-arrow{font-size:13px;color:#AEAEB2;}
+.ct-body{display:none;}
+.ct-body.open{display:block;}
+.ct-unit-row{display:flex;align-items:center;padding:12px 16px;border-bottom:0.5px solid rgba(0,0,0,.06);gap:10px;cursor:pointer;}
+.ct-unit-row:last-child{border-bottom:none;}
+.ct-unit-row:active{background:#F8F8F8;}
+.ct-unit-name{flex:1;font-size:14px;font-weight:600;}
+.ct-unit-sub{font-size:11px;color:#8E8E93;font-weight:400;margin-left:4px;}
+.ct-unit-right{display:flex;flex-direction:column;align-items:flex-end;gap:3px;}
+.pay-status-row{display:flex;align-items:center;padding:8px 16px;border-bottom:0.5px solid rgba(0,0,0,.06);gap:8px;}
+.pay-status-row:last-child{border-bottom:none;}
+.pay-status-date{font-size:13px;font-weight:500;min-width:90px;color:#333;}
+.pay-status-badge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;}
+.pay-status-badge.regular{background:#E8F8EF;color:#1A7A40;}
+.pay-status-badge.late{background:#FFF4E0;color:#7A4D00;}
+.pay-status-badge.unpaid{background:#FFEBEA;color:#B91C1C;}
+.pay-status-badge.none{background:#F2F2F7;color:#AEAEB2;}
+.ct-action-bar{display:flex;gap:8px;padding:10px 16px;background:#F8F8F8;border-top:0.5px solid rgba(0,0,0,.06);}
+.ct-action-btn{flex:1;padding:9px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;border:none;text-align:center;}
+.ct-edit-btn{background:#E5F0FF;color:#007AFF;}
+.ct-del-btn{background:#FFEBEA;color:#FF3B30;}
 .rm-prop-hdr{padding:13px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid rgba(0,0,0,.08);}
 .rm-prop-title{font-size:16px;font-weight:700;}
 .rm-prop-stat{font-size:12px;font-weight:600;padding:3px 10px;border-radius:99px;}
@@ -574,6 +606,21 @@ function saveData() {
       alert("저장 공간이 부족합니다. 일부 데이터를 삭제해주세요.");
     }
   }
+}
+function contractDday(endStr) {
+  // 종료일까지 남은 기간 문자열 반환 (예: "3개월2일", "D-15")
+  if (!endStr) { return null; }
+  var now = new Date(); now.setHours(0,0,0,0);
+  var end = new Date(endStr); end.setHours(0,0,0,0);
+  var diffMs = end - now;
+  var diffDays = Math.ceil(diffMs / 86400000);
+  if (diffDays < 0) { return { text: "만료", color: "#AEAEB2", urgent: false }; }
+  var months = Math.floor(diffDays / 30);
+  var days = diffDays % 30;
+  var text = months > 0 ? months+"개월"+days+"일" : diffDays+"일";
+  var urgent = diffDays <= 60; // 2개월 이내
+  var color = urgent ? "#FF3B30" : "#8E8E93";
+  return { text: text, color: color, urgent: urgent };
 }
 function periodicExpenses(propId) {
   // 정기지출만 합산. propId 지정 시 해당 물건 귀속 + 공통만
@@ -1032,318 +1079,284 @@ function renderPortfolio() {
 
 // ── RENDER CONTRACTS ──────────────────────────────────────────────
 function renderContracts() {
-  if (!CONTRACTS.length) {
-    ge("clist").innerHTML = '<div class="emp"><div class="emp-i">📋</div><p>오른쪽 위 + 버튼으로<br>계약을 추가하세요</p></div>';
+  var clist = ge("clist"); clist.innerHTML = "";
+
+  if (!PROPS.length && !CONTRACTS.length) {
+    clist.innerHTML = '<div class="emp"><div class="emp-i">📋</div><p>오른쪽 위 + 버튼으로<br>계약을 추가하세요</p></div>';
     return;
   }
-  var rows = document.createElement("div"); rows.className = "lcard";
-  for (var i = 0; i < CONTRACTS.length; i++) {
-    var c = CONTRACTS[i]; var st = cstatus(c.end);
-    if (pendingDel && pendingDel.type === "contract" && pendingDel.id === c.id) {
-      var dc = document.createElement("div"); dc.className = "dconf";
-      var dtxt = document.createElement("span"); dtxt.className = "dconf-txt";
-      dtxt.textContent = c.tenant + " 계약을 삭제할까요?";
-      var dbtns = document.createElement("div"); dbtns.className = "dbtns";
-      var dcn = document.createElement("button"); dcn.className = "dcn"; dcn.textContent = "취소";
-      dcn.addEventListener("click", cancelDel);
-      var dok = document.createElement("button"); dok.className = "dok"; dok.textContent = "삭제";
-      dok.addEventListener("click", doDel);
-      dbtns.appendChild(dcn); dbtns.appendChild(dok);
-      dc.appendChild(dtxt); dc.appendChild(dbtns);
-      rows.appendChild(dc);
-    } else {
-      // ─── 계약 카드 ───────────────────────────────────────────
-      var wrap = document.createElement("div");
-      wrap.style.cssText = "background:#fff;border-radius:12px;margin-bottom:1px;overflow:hidden;";
 
-      // 메인 행
-      var row = document.createElement("div"); row.className = "lr";
-      var lic = document.createElement("div"); lic.className = "lic"; lic.style.background = "#E5F0FF"; lic.textContent = "👤";
-      var lb = document.createElement("div"); lb.className = "lb";
-      var lt = document.createElement("div"); lt.className = "lt"; lt.textContent = pname(c.propId) + " · " + (c.unit || c.tenant);
-      var ls = document.createElement("div"); ls.className = "ls"; ls.textContent = c.type;
-      var le = document.createElement("div"); le.style.cssText = "font-size:12px;color:#8E8E93;margin-top:2px;"; le.textContent = "만료 " + (c.end || "–");
-      lb.appendChild(lt); lb.appendChild(ls); lb.appendChild(le);
-      // 전화번호
-      if (c.phone) {
-        var phoneA = document.createElement("a");
-        phoneA.className = "phone-btn";
-        phoneA.href = "tel:" + c.phone.replace(/[^0-9+]/g, "");
-        phoneA.innerHTML = "📞 " + c.phone;
-        lb.appendChild(phoneA);
+  // 물건별 그룹핑 + 호실 정렬
+  var propGroups = {};
+  CONTRACTS.forEach(function(c) {
+    var pid = c.propId || 0;
+    if (!propGroups[pid]) { propGroups[pid] = []; }
+    propGroups[pid].push(c);
+  });
+
+  // 호실 이름 순 정렬
+  Object.keys(propGroups).forEach(function(pid) {
+    propGroups[pid].sort(function(a, b) {
+      var ua = (a.unit || a.tenant || "").trim();
+      var ub = (b.unit || b.tenant || "").trim();
+      return ua.localeCompare(ub, "ko");
+    });
+  });
+
+  // 물건 순서 (등록된 물건 → 물건 없는 계약)
+  var propOrder = PROPS.map(function(p){ return p.id; });
+  if (propGroups[0]) { propOrder.push(0); }
+  // 계약 없는 물건도 표시
+  PROPS.forEach(function(p) {
+    if (!propGroups[p.id]) { propGroups[p.id] = []; }
+  });
+
+  propOrder.forEach(function(pid, pidx) {
+    var prop = null;
+    for (var pi=0; pi<PROPS.length; pi++) { if (PROPS[pi].id===pid) { prop=PROPS[pi]; break; } }
+    var contracts = propGroups[pid] || [];
+    var propName = prop ? prop.name : "물건 미지정";
+
+    var card = document.createElement("div"); card.className = "ct-prop-card";
+
+    // 헤더
+    var hdr = document.createElement("div"); hdr.className = "ct-prop-hdr";
+    var hdrLeft = document.createElement("div");
+    var nameEl = document.createElement("div"); nameEl.className = "ct-prop-name";
+    nameEl.textContent = (prop ? semoji(prop.type)+" " : "") + propName;
+    var metaEl = document.createElement("div"); metaEl.className = "ct-prop-meta";
+    metaEl.textContent = prop ? prop.loc : "";
+    hdrLeft.appendChild(nameEl); hdrLeft.appendChild(metaEl);
+
+    var hdrRight = document.createElement("div"); hdrRight.className = "ct-prop-right";
+    var cntBadge = document.createElement("div"); cntBadge.className = "ct-prop-cnt";
+    cntBadge.textContent = contracts.length + "건";
+    var arrowEl = document.createElement("div"); arrowEl.className = "ct-prop-arrow";
+    arrowEl.textContent = pidx === 0 ? "▴" : "▾";
+    hdrRight.appendChild(cntBadge); hdrRight.appendChild(arrowEl);
+    hdr.appendChild(hdrLeft); hdr.appendChild(hdrRight);
+    card.appendChild(hdr);
+
+    // 호실 목록 (첫 번째 물건 기본 펼침)
+    var body = document.createElement("div"); body.className = "ct-body";
+    if (pidx === 0) { body.classList.add("open"); }
+    hdr.addEventListener("click", function() {
+      body.classList.toggle("open");
+      arrowEl.textContent = body.classList.contains("open") ? "▴" : "▾";
+    });
+
+    if (!contracts.length) {
+      var emptyRow = document.createElement("div");
+      emptyRow.style.cssText = "padding:12px 16px;font-size:13px;color:#AEAEB2;";
+      emptyRow.textContent = "등록된 계약이 없습니다";
+      body.appendChild(emptyRow);
+    }
+
+    contracts.forEach(function(c) {
+      if (pendingDel && pendingDel.type === "contract" && pendingDel.id === c.id) {
+        var dc = document.createElement("div"); dc.className = "dconf";
+        var dtxt = document.createElement("span"); dtxt.className = "dconf-txt";
+        dtxt.textContent = (c.unit||c.tenant) + " 계약을 삭제할까요?";
+        var dbtns = document.createElement("div"); dbtns.className = "dbtns";
+        var dcn = document.createElement("button"); dcn.className = "dcn"; dcn.textContent = "취소";
+        dcn.addEventListener("click", cancelDel);
+        var dok = document.createElement("button"); dok.className = "dok"; dok.textContent = "삭제";
+        dok.addEventListener("click", doDel);
+        dbtns.appendChild(dcn); dbtns.appendChild(dok);
+        dc.appendChild(dtxt); dc.appendChild(dbtns);
+        body.appendChild(dc);
+        return;
       }
-      var lv = document.createElement("div"); lv.className = "lv";
-      var lv1 = document.createElement("div"); lv1.className = "lv1"; lv1.textContent = c.monthly ? fmt(c.monthly)+"만" : "전세";
-      var lv2 = document.createElement("div"); lv2.className = "lv2";
-      var bdg = document.createElement("span"); bdg.className = "bdg " + st.c; bdg.textContent = st.l;
-      lv2.appendChild(bdg); lv.appendChild(lv1); lv.appendChild(lv2);
-      row.appendChild(lic); row.appendChild(lb); row.appendChild(lv);
-      wrap.appendChild(row);
 
-      // 납부일 계산 및 납부 현황 (월세 또는 계약이 있으면 표시)
+      var st = cstatus(c.end);
+      // 호실 행 (탭하면 상세 펼침)
+      var unitRow = document.createElement("div"); unitRow.className = "ct-unit-row";
+      var uLeft = document.createElement("div"); uLeft.style.cssText="flex:1;";
+      var uName = document.createElement("div"); uName.className = "ct-unit-name";
+      uName.textContent = c.unit || c.tenant;
+      var uSub = document.createElement("span"); uSub.className = "ct-unit-sub";
+      uSub.textContent = c.type + " · 만료 " + (c.end||"–");
+      uName.appendChild(uSub);
+      if (c.phone) {
+        var ph = document.createElement("a");
+        ph.href = "tel:" + c.phone.replace(/[^0-9+]/g,"");
+        ph.className = "phone-btn"; ph.innerHTML = "📞 " + c.phone;
+        ph.addEventListener("click", function(e){ e.stopPropagation(); });
+        uLeft.appendChild(uName); uLeft.appendChild(ph);
+      } else {
+        uLeft.appendChild(uName);
+      }
+      var uRight = document.createElement("div"); uRight.className = "ct-unit-right";
+      var uAmt = document.createElement("div"); uAmt.style.cssText="font-size:15px;font-weight:600;";
+      uAmt.textContent = c.monthly ? fmt(c.monthly)+"만/월" : "전세";
+      if (c.deposit) {
+        var uDep = document.createElement("div"); uDep.style.cssText="font-size:11px;color:#5856D6;font-weight:500;";
+        uDep.textContent = "보증 "+fmt(c.deposit)+"만";
+        uRight.appendChild(uDep);
+      }
+      var uBdg = document.createElement("span"); uBdg.className = "bdg "+st.c; uBdg.textContent = st.l;
+      uRight.appendChild(uAmt);
+      if (c.deposit) {
+        var uDep = document.createElement("div");
+        uDep.style.cssText = "font-size:11px;color:#5856D6;font-weight:500;margin-top:2px;";
+        uDep.textContent = "보증금 "+fmt(c.deposit)+"만";
+        uRight.appendChild(uDep);
+      }
+      uRight.appendChild(uBdg);
+      unitRow.appendChild(uLeft); unitRow.appendChild(uRight);
+
+      // 상세 - 탭하면 토글
+      var detail = document.createElement("div");
+      detail.style.cssText = "display:none;background:#FAFAFA;border-top:0.5px solid rgba(0,0,0,.06);";
+      var detailOpen = false;
+      unitRow.addEventListener("click", function() {
+        detailOpen = !detailOpen;
+        detail.style.display = detailOpen ? "block" : "none";
+      });
+
+      // ── 납부 히스토리 (정기/지연/미납 구분) ───────────────────
       if (c.monthly || c.start) {
         var now2 = new Date();
         var startD = c.start ? new Date(c.start) : now2;
-        var payDay = startD.getDate(); // 계약 시작일의 날짜 = 매월 납부일
-        var thisMonKey = now2.getFullYear() + "-" + (now2.getMonth()+1);
-        var thisMonStatus = (c.payments && c.payments[thisMonKey]) || "none";
-
-        // 이번 달 납부 예정일
-        var dueDateThisMon = new Date(now2.getFullYear(), now2.getMonth(), payDay);
-        var diffDays = Math.ceil((dueDateThisMon - now2) / 86400000);
-
-        // 납부 알림 배너
-        var banner = document.createElement("div");
-        if (thisMonStatus === "paid" || thisMonStatus === "early") {
-          banner.className = "due-banner ok";
-          banner.innerHTML = '<span class="due-txt">' + (thisMonStatus==="early"?"⚡ 조기납부 완료":"✓ ") + (thisMonStatus!=="early"?(now2.getMonth()+1)+"월 납부 완료":"") + '</span>';
-        } else if (diffDays < 0) {
-          banner.className = "due-banner overdue";
-          banner.innerHTML = '<span class="due-txt">⚠ ' + (now2.getMonth()+1) + '월 납부일 ' + Math.abs(diffDays) + '일 경과 — 미확인</span>';
-        } else if (diffDays <= 7) {
-          banner.className = "due-banner due-soon";
-          banner.innerHTML = '<span class="due-txt">🔔 납부일 D-' + diffDays + ' (' + (now2.getMonth()+1) + '/' + payDay + '일)</span>';
-        } else {
-          banner.className = "due-banner ok";
-          banner.innerHTML = '<span class="due-txt">납부일 매월 ' + payDay + '일</span>';
-        }
-
-        // 히스토리 토글 버튼
-        var toggleBtn = document.createElement("button");
-        toggleBtn.className = "pay-hist-toggle";
-        toggleBtn.textContent = "납부 내역 보기 ▾";
-        banner.appendChild(toggleBtn);
-        wrap.appendChild(banner);
-
-        // 납부 히스토리 (계약 시작월 ~ 현재월)
-        var hist = document.createElement("div"); hist.className = "pay-hist";
-        (function(tBtn, hst) {
-          tBtn.addEventListener("click", function() {
-            hst.classList.toggle("open");
-            tBtn.textContent = hst.classList.contains("open") ? "납부 내역 접기 ▴" : "납부 내역 보기 ▾";
-          });
-        })(toggleBtn, hist);
-
-        // 월 목록 생성 (시작월 ~ 현재월, 최소 12개월 보장)
-        var months = [];
-        var defaultStart = new Date(now2.getFullYear(), now2.getMonth() - 11, 1);
-        var histStart = c.start ? new Date(startD.getFullYear(), startD.getMonth(), 1) : defaultStart;
-        // 시작일이 있어도 최소 12개월은 보여줌
-        if (histStart > defaultStart) { histStart = defaultStart; }
+        var payDay = startD.getDate();
+        var histStart = c.start ? new Date(startD.getFullYear(), startD.getMonth(), 1) : new Date(now2.getFullYear(), now2.getMonth(), 1);
         var cur2 = new Date(histStart);
         var limit = new Date(now2.getFullYear(), now2.getMonth(), 1);
+        var months = [];
         while (cur2 <= limit && months.length < 36) {
           months.push({y: cur2.getFullYear(), m: cur2.getMonth()});
           cur2.setMonth(cur2.getMonth() + 1);
         }
-
-        // 최신이 위에 오도록 역순
         months.reverse();
 
-        // 합계 집계
-        var paidCnt = 0, unpaidCnt = 0, noneCnt = 0, earlyCnt = 0;
-        months.forEach(function(mo) {
-          var k2 = mo.y + "-" + (mo.m+1);
-          var s2 = (c.payments && c.payments[k2]) || "none";
-          if (s2 === "paid" || s2 === "prepaid") { paidCnt++; }
-          else if (s2 === "early") { earlyCnt++; }
-          else if (s2 === "unpaid") { unpaidCnt++; }
-          else { noneCnt++; }
+        // 납부 내역 보기 토글
+        var histToggle = document.createElement("div");
+        histToggle.style.cssText = "padding:8px 16px;font-size:12px;color:#007AFF;cursor:pointer;font-weight:600;border-top:0.5px solid rgba(0,0,0,.06);";
+        histToggle.textContent = "납부 내역 보기 ▾";
+        var histBox = document.createElement("div"); histBox.style.display = "none";
+        var histOpen = false;
+        histToggle.addEventListener("click", function(e) {
+          e.stopPropagation();
+          histOpen = !histOpen;
+          histBox.style.display = histOpen ? "block" : "none";
+          histToggle.textContent = histOpen ? "납부 내역 접기 ▴" : "납부 내역 보기 ▾";
         });
 
-        // 요약 행
-        var sumRow = document.createElement("div");
-        sumRow.style.cssText = "display:flex;gap:12px;padding:8px 16px 6px;background:#F8F8F8;border-top:0.5px solid rgba(0,0,0,.06);";
-        sumRow.innerHTML =
-          '<span style="font-size:11px;color:#1A7A40;font-weight:600;">납부 ' + paidCnt + '건</span>' +
-          (earlyCnt > 0 ? '<span style="font-size:11px;color:#0055CC;font-weight:600;">⚡조기 ' + earlyCnt + '건</span>' : '') +
-          '<span style="font-size:11px;color:#B91C1C;font-weight:600;">미납 ' + unpaidCnt + '건</span>' +
-          '<span style="font-size:11px;color:#AEAEB2;">미기록 ' + noneCnt + '건</span>';
-        hist.appendChild(sumRow);
+        // 집계
+        var paidCnt=0, lateCnt=0, unpaidCnt=0, noneCnt=0;
+        months.forEach(function(mo) {
+          var k2 = mo.y+"-"+(mo.m+1);
+          var s2 = (c.payments&&c.payments[k2])||"none";
+          var dueDate = new Date(mo.y, mo.m, payDay);
+          var nowMs = now2.getTime();
+          var latedays = Math.floor((nowMs - dueDate.getTime())/86400000);
+          if(s2==="paid"||s2==="prepaid"||s2==="early"){paidCnt++;}
+          else if(s2==="unpaid"){unpaidCnt++;}
+          else if(s2==="none"&&latedays>0){lateCnt++;}
+          else{noneCnt++;}
+        });
+        var sumDiv = document.createElement("div");
+        sumDiv.style.cssText="display:flex;gap:10px;padding:6px 16px;background:#F8F8F8;font-size:11px;";
+        sumDiv.innerHTML = '<span style="color:#1A7A40;font-weight:600;">정기 '+paidCnt+'</span><span style="color:#FF9500;font-weight:600;">지연 '+lateCnt+'</span><span style="color:#FF3B30;font-weight:600;">미납 '+unpaidCnt+'</span><span style="color:#AEAEB2;">미기록 '+noneCnt+'</span>';
+        histBox.appendChild(sumDiv);
 
         months.forEach(function(mo) {
-          var k2 = mo.y + "-" + (mo.m+1);
-          var payDateStr = mo.y + "년 " + (mo.m+1) + "월 " + payDay + "일";
-          var s2 = (c.payments && c.payments[k2]) || "none";
-          var isFuture = (mo.y > now2.getFullYear()) || (mo.y === now2.getFullYear() && mo.m > now2.getMonth());
+          var k2 = mo.y+"-"+(mo.m+1);
+          var s2 = (c.payments&&c.payments[k2])||"none";
+          var dueDate = new Date(mo.y, mo.m, payDay);
+          var nowMs = now2.getTime();
+          var latedays = Math.floor((nowMs - dueDate.getTime())/86400000);
+          var isCurMon = (mo.y===now2.getFullYear()&&mo.m===now2.getMonth());
 
-          var hrow = document.createElement("div"); hrow.className = "pay-hist-row";
-
-          var dateEl = document.createElement("div"); dateEl.className = "pay-hist-date";
-          dateEl.textContent = payDateStr;
-          if (mo.y === now2.getFullYear() && mo.m === now2.getMonth()) {
-            dateEl.style.color = "#007AFF"; dateEl.style.fontWeight = "700";
+          // 납부 상태 판정
+          var statusType, statusText, statusColor;
+          if(s2==="paid"||s2==="prepaid"||s2==="early"){
+            statusType="regular"; statusText="정기납부"; statusColor="#1A7A40";
+            if(s2==="early"){ statusText="⚡조기납부"; }
+            if(s2==="prepaid"){ statusText="✓선납"; }
+          } else if(s2==="unpaid"){
+            statusType="unpaid";
+            statusText="미납"+(latedays>0?" (+"+latedays+"일)":""); statusColor="#FF3B30";
+          } else if(latedays>0&&s2==="none"){
+            statusType="late";
+            statusText="지연 +"+latedays+"일"; statusColor="#FF9500";
+          } else {
+            statusType="none"; statusText="미기록"; statusColor="#AEAEB2";
           }
 
-          var stEl = document.createElement("div"); hrow.className = "pay-hist-row";
-          var statusBadge = document.createElement("span");
-          statusBadge.className = "bdg " + (s2==="paid"||s2==="prepaid"?"bg":s2==="early"?"bb":s2==="unpaid"?"br":"bgr");
-          statusBadge.textContent = s2==="paid"?"납부":s2==="prepaid"?"✓선납완료":s2==="early"?"⚡조기납부":s2==="unpaid"?"미납":"미기록";
-
-          var btnEl = document.createElement("button");
-          if (s2 === "paid")        { btnEl.className="pay-hist-btn to-unpaid"; btnEl.textContent="미납 처리"; }
-          else if (s2 === "prepaid"){ btnEl.className="pay-hist-btn to-prepaid"; btnEl.textContent="선납취소"; }
-          else if (s2 === "early")  { btnEl.className="pay-hist-btn to-unpaid"; btnEl.textContent="미납 처리"; }
-          else if (s2 === "unpaid") { btnEl.className="pay-hist-btn to-none";   btnEl.textContent="초기화"; }
-          else                      { btnEl.className="pay-hist-btn to-early";  btnEl.textContent="조기납부"; }
-
-          (function(cid3, k3, sbEl, btnEl2, hrowEl, mo3) {
-            // 요약 재계산 공통 함수
-            function refreshSummary(paymentsObj) {
-              var pc=0,uc=0,nc=0,ec=0;
-              months.forEach(function(m4){
-                var k4=m4.y+"-"+(m4.m+1);
-                var s4=(paymentsObj&&paymentsObj[k4])||"none";
-                if(s4==="paid"||s4==="prepaid")pc++;
-                else if(s4==="early")ec++;
-                else if(s4==="unpaid")uc++;
-                else nc++;
-              });
-              sumRow.innerHTML='<span style="font-size:11px;color:#1A7A40;font-weight:600;">납부 '+pc+'건</span>'+(ec>0?'<span style="font-size:11px;color:#0055CC;font-weight:600;">⚡조기 '+ec+'건</span>':'')+'<span style="font-size:11px;color:#B91C1C;font-weight:600;">미납 '+uc+'건</span><span style="font-size:11px;color:#AEAEB2;">미기록 '+nc+'건</span>';
-            }
-
-            btnEl2.addEventListener("click", function() {
-              for (var ci3=0;ci3<CONTRACTS.length;ci3++) {
-                if (CONTRACTS[ci3].id!==cid3) { continue; }
-                if (!CONTRACTS[ci3].payments) { CONTRACTS[ci3].payments={}; }
-                var cur3 = CONTRACTS[ci3].payments[k3] || "none";
-
-                if (cur3 === "none") {
-                  // 조기납부 클릭 → 월 선택 팝업 표시
-                  // 기존 팝업 제거
-                  var existPicker = hrowEl.nextSibling;
-                  if (existPicker && existPicker.classList && existPicker.classList.contains("early-picker")) {
-                    existPicker.parentNode.removeChild(existPicker);
-                    return;
-                  }
-                  var picker = document.createElement("div"); picker.className = "early-picker";
-                  var ptitle = document.createElement("div"); ptitle.className = "early-picker-title";
-                  ptitle.textContent = "어느 달 월세를 미리 납부하셨나요?";
-                  picker.appendChild(ptitle);
-                  var pmonths = document.createElement("div"); pmonths.className = "early-picker-months";
-                  // 현재달 + 이후 6개월 복수 선택 가능
-                  var now3 = new Date();
-                  var selectedTargets = [];
-                  var pconfirmRef = null;
-                  function updateConfirmBtn() {
-                    if (pconfirmRef) {
-                      pconfirmRef.textContent = selectedTargets.length > 0
-                        ? selectedTargets.length + "개월 선납 처리하기"
-                        : "선납 처리하기";
-                      pconfirmRef.style.opacity = selectedTargets.length > 0 ? "1" : "0.5";
-                    }
-                  }
-                  for (var fi=0; fi<=6; fi++) {
-                    var fd = new Date(now3.getFullYear(), now3.getMonth()+fi, 1);
-                    var fk = fd.getFullYear()+"-"+(fd.getMonth()+1);
-                    var fLbl = (fd.getMonth()+1)+"월"+(fi===0?" (이번달)":"");
-                    var fStatus = CONTRACTS[ci3].payments[fk] || "none";
-                    var mon = document.createElement("button"); mon.className = "ep-mon";
-                    mon.textContent = fLbl;
-                    mon.dataset.key = fk;
-                    if (fStatus==="prepaid"||fStatus==="paid") {
-                      mon.className = "ep-mon already"; mon.textContent += " ✓"; mon.disabled = true;
-                    } else {
-                      mon.addEventListener("click", function() {
-                        var mk = this.dataset.key;
-                        var idx = selectedTargets.indexOf(mk);
-                        if (idx >= 0) {
-                          selectedTargets.splice(idx, 1);
-                          this.classList.remove("selected");
-                        } else {
-                          selectedTargets.push(mk);
-                          this.classList.add("selected");
-                        }
-                        updateConfirmBtn();
-                      });
-                    }
-                    pmonths.appendChild(mon);
-                  }
-                  picker.appendChild(pmonths);
-                  var pconfirm = document.createElement("button"); pconfirm.className = "ep-confirm";
-                  pconfirm.textContent = "선납 처리하기";
-                  pconfirm.style.opacity = "0.5";
-                  pconfirmRef = pconfirm;
-                  pconfirm.addEventListener("click", function() {
-                    if (!selectedTargets.length) { alert("납부할 달을 선택하세요. 복수 선택 가능합니다."); return; }
-                    // 이번달: early 로 표시
-                    CONTRACTS[ci3].payments[k3] = "early";
-                    // 선택한 달들: prepaid 로 표시
-                    for (var si=0; si<selectedTargets.length; si++) {
-                      CONTRACTS[ci3].payments[selectedTargets[si]] = "prepaid";
-                    }
-                    saveData();
-                    picker.parentNode.removeChild(picker);
-                    // 현재 행 뱃지/버튼 업데이트
-                    sbEl.className="bdg bb"; sbEl.textContent="⚡조기납부";
-                    btnEl2.className="pay-hist-btn to-unpaid"; btnEl2.textContent="미납 처리";
-                    refreshSummary(CONTRACTS[ci3].payments);
-                    // 선납된 달 행들 업데이트
-                    hist.querySelectorAll(".pay-hist-row").forEach(function(row){
-                      if(selectedTargets.indexOf(row.dataset.monthKey) >= 0){
-                        var sb2=row.querySelector(".bdg"); var btn2=row.querySelector(".pay-hist-btn");
-                        if(sb2){sb2.className="bdg bg";sb2.textContent="✓선납완료";}
-                        if(btn2){btn2.className="pay-hist-btn to-prepaid";btn2.textContent="선납취소";}
-                      }
-                    });
-                  });
-                  picker.appendChild(pconfirm);
-                  hrowEl.parentNode.insertBefore(picker, hrowEl.nextSibling);
-
-                } else if (cur3==="prepaid") {
-                  // 선납취소
-                  CONTRACTS[ci3].payments[k3] = "none";
-                  sbEl.className="bdg bgr"; sbEl.textContent="미기록";
-                  btnEl2.className="pay-hist-btn to-early"; btnEl2.textContent="조기납부";
-                  saveData(); refreshSummary(CONTRACTS[ci3].payments);
-
-                } else {
-                  // paid/early → unpaid → none 순환
-                  var next = (cur3==="paid"||cur3==="early")?"unpaid":"none";
-                  CONTRACTS[ci3].payments[k3] = next;
-                  sbEl.className = "bdg "+(next==="unpaid"?"br":"bgr");
-                  sbEl.textContent = next==="unpaid"?"미납":"미기록";
-                  if(next==="unpaid"){btnEl2.className="pay-hist-btn to-none";btnEl2.textContent="초기화";}
-                  else{btnEl2.className="pay-hist-btn to-early";btnEl2.textContent="조기납부";}
-                  saveData(); refreshSummary(CONTRACTS[ci3].payments);
-                }
+          var hrow = document.createElement("div"); hrow.className = "pay-status-row";
+          var dateEl = document.createElement("div"); dateEl.className = "pay-status-date";
+          dateEl.textContent = (mo.m+1)+"월 "+payDay+"일";
+          if(isCurMon){ dateEl.style.color="#007AFF"; dateEl.style.fontWeight="700"; }
+          var sbEl = document.createElement("span");
+          sbEl.className = "pay-status-badge "+statusType;
+          sbEl.textContent = statusText;
+          // 탭하면 납부↔미납 토글
+          (function(cid3,k3,sbEl2,hrow2) {
+            hrow2.style.cursor="pointer";
+            hrow2.addEventListener("click", function(e){
+              e.stopPropagation();
+              for(var ci3=0;ci3<CONTRACTS.length;ci3++){
+                if(CONTRACTS[ci3].id!==cid3){continue;}
+                if(!CONTRACTS[ci3].payments){CONTRACTS[ci3].payments={};}
+                var cur3=CONTRACTS[ci3].payments[k3]||"none";
+                var next3;
+                if(cur3==="paid"||cur3==="prepaid"||cur3==="early"){next3="unpaid";}
+                else if(cur3==="unpaid"){next3="none";}
+                else{next3="paid";}
+                CONTRACTS[ci3].payments[k3]=next3;
+                saveData();
+                var d3=new Date(parseInt(k3.split("-")[0]),parseInt(k3.split("-")[1])-1,payDay);
+                var ld3=Math.floor((now2.getTime()-d3.getTime())/86400000);
+                if(next3==="paid"){sbEl2.className="pay-status-badge regular";sbEl2.textContent="정기납부";}
+                else if(next3==="unpaid"){sbEl2.className="pay-status-badge unpaid";sbEl2.textContent="미납"+(ld3>0?" (+"+ld3+"일)":"");}
+                else if(ld3>0){sbEl2.className="pay-status-badge late";sbEl2.textContent="지연 +"+ld3+"일";}
+                else{sbEl2.className="pay-status-badge none";sbEl2.textContent="미기록";}
+                // 요약 갱신
+                var pc2=0,lc2=0,uc2=0,nc2=0;
+                months.forEach(function(m4){var k4=m4.y+"-"+(m4.m+1);var s4=(CONTRACTS[ci3].payments&&CONTRACTS[ci3].payments[k4])||"none";var d4=new Date(m4.y,m4.m,payDay);var ld4=Math.floor((now2.getTime()-d4.getTime())/86400000);if(s4==="paid"||s4==="prepaid"||s4==="early")pc2++;else if(s4==="unpaid")uc2++;else if(s4==="none"&&ld4>0)lc2++;else nc2++;});
+                sumDiv.innerHTML='<span style="color:#1A7A40;font-weight:600;">정기 '+pc2+'</span><span style="color:#FF9500;font-weight:600;">지연 '+lc2+'</span><span style="color:#FF3B30;font-weight:600;">미납 '+uc2+'</span><span style="color:#AEAEB2;">미기록 '+nc2+'</span>';
                 break;
               }
             });
-          })(c.id, k2, statusBadge, btnEl, hrow, mo);
-
-          hrow.dataset.monthKey = k2;
-          hrow.appendChild(dateEl); hrow.appendChild(statusBadge); hrow.appendChild(btnEl);
-          hist.appendChild(hrow);
+          })(c.id,k2,sbEl,hrow);
+          hrow.appendChild(dateEl); hrow.appendChild(sbEl);
+          histBox.appendChild(hrow);
         });
-        wrap.appendChild(hist);
+        detail.appendChild(histToggle);
+        detail.appendChild(histBox);
       }
 
       // 메모
       if (c.memo) {
-        var memoDiv = document.createElement("div"); memoDiv.className = "memo-row";
-        var memoTxt = document.createElement("div"); memoTxt.className = "memo-text";
-        memoTxt.textContent = c.memo;
-        memoDiv.appendChild(memoTxt);
-        wrap.appendChild(memoDiv);
+        var memoDiv2 = document.createElement("div"); memoDiv2.className = "memo-row";
+        memoDiv2.style.background="#FAFAFA";
+        var memoTxt2 = document.createElement("div"); memoTxt2.className = "memo-text";
+        memoTxt2.textContent = c.memo;
+        memoDiv2.appendChild(memoTxt2);
+        detail.appendChild(memoDiv2);
       }
 
-      rows.appendChild(wrap);
-      var ar = document.createElement("div"); ar.className = "arow";
-      var eb = document.createElement("button"); eb.className = "ae"; eb.textContent = "수정";
-      (function(cid) { eb.addEventListener("click", function() { openSheet("contract", cid); }); })(c.id);
-      var db = document.createElement("button"); db.className = "ad"; db.textContent = "삭제";
-      (function(cid) { db.addEventListener("click", function() { askDel("contract", cid); }); })(c.id);
-      var pfBtn = document.createElement("button");
-      pfBtn.style.cssText = "flex:1;padding:9px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:#F2F2F7;color:#6C6C70;";
-      pfBtn.textContent = "포트폴리오";
-      pfBtn.addEventListener("click", function() { goTab("portfolio", true); });
-      ar.appendChild(eb); ar.appendChild(pfBtn); ar.appendChild(db);
-      rows.appendChild(ar);
-    }
+      // 수정/삭제 버튼 (호실 상세 안에)
+      var ctAr = document.createElement("div"); ctAr.className = "ct-action-bar";
+      var ctEb = document.createElement("button"); ctEb.className = "ct-action-btn ct-edit-btn"; ctEb.textContent = "수정";
+      (function(cid){ctEb.addEventListener("click",function(e){e.stopPropagation();openSheet("contract",cid);});})(c.id);
+      var ctDb = document.createElement("button"); ctDb.className = "ct-action-btn ct-del-btn"; ctDb.textContent = "삭제";
+      (function(cid){ctDb.addEventListener("click",function(e){e.stopPropagation();askDel("contract",cid);});})(c.id);
+      ctAr.appendChild(ctEb); ctAr.appendChild(ctDb);
+      detail.appendChild(ctAr);
+
+      body.appendChild(unitRow);
+      body.appendChild(detail);
+    });
+
+    card.appendChild(body);
+    clist.appendChild(card);
+  });
+
+  if (!clist.children.length) {
+    clist.innerHTML = '<div class="emp"><div class="emp-i">📋</div><p>오른쪽 위 + 버튼으로<br>계약을 추가하세요</p></div>';
   }
-  ge("clist").innerHTML = "";
-  ge("clist").appendChild(rows);
 }
 
 // ── RENDER EXPENSES ──────────────────────────────────────────────
@@ -1732,8 +1745,9 @@ function renderRentMgr() {
 
   var monthKey = _rmYear + "-" + (_rmMonth + 1);
 
-  // 이번 달 계약들 수집 (계약이 있으면 모두 표시)
+  // 임대중인 계약만 표시 (만료 안 된 것, 월세 있는 것)
   var activeContracts = CONTRACTS.filter(function(c) {
+    if (!c.monthly) { return false; } // 월세 없는 계약 제외
     if (c.start && new Date(c.start) > new Date(_rmYear, _rmMonth + 1, 0)) { return false; }
     if (c.end && new Date(c.end) < new Date(_rmYear, _rmMonth, 1)) { return false; }
     return true;
@@ -1758,11 +1772,21 @@ function renderRentMgr() {
     else { cntNone++; }
   });
 
+  // 미확인: 납부일 지났는데 미기록인 건
+  var cntUnconfirmed = 0;
+  var now3s = new Date();
+  activeContracts.forEach(function(c) {
+    var s3s = (c.payments && c.payments[monthKey]) || "none";
+    var pd3s = c.start ? new Date(c.start).getDate() : 1;
+    var dd3s = new Date(now3s.getFullYear(), now3s.getMonth(), pd3s);
+    if (s3s==="none" && now3s > dd3s) { cntUnconfirmed++; }
+  });
   var sumEl = ge("rm-summary");
   sumEl.innerHTML =
     '<div class="rm-sum-item"><div class="rm-sum-lbl">납부완료 <span style="color:#1A7A40;font-weight:700;">' + cntPaid + '가구</span></div><div class="rm-sum-val" style="color:#1A7A40;">+' + fmt(totalPaid) + '만</div></div>' +
     '<div class="rm-sum-item"><div class="rm-sum-lbl">미납 <span style="color:#B91C1C;font-weight:700;">' + cntUnpaid + '가구</span></div><div class="rm-sum-val" style="color:#B91C1C;">' + (totalUnpaid?"-"+fmt(totalUnpaid):"–") + '만</div></div>' +
-    '<div class="rm-sum-item"><div class="rm-sum-lbl">공실 <span style="color:#AEAEB2;font-weight:700;">' + cntNone + '가구</span></div><div class="rm-sum-val" style="color:#AEAEB2;">' + fmt(totalNone) + '만</div></div>' +
+    (cntUnconfirmed>0?'<div class="rm-sum-item"><div class="rm-sum-lbl">미확인 <span style="color:#FF9500;font-weight:700;">'+cntUnconfirmed+'가구</span></div><div class="rm-sum-val" style="color:#FF9500;">확인필요</div></div>':'')+
+    '<div class="rm-sum-item"><div class="rm-sum-lbl">공실 <span style="color:#AEAEB2;font-weight:700;">' + cntNone + '가구</span></div><div class="rm-sum-val" style="color:#AEAEB2;">0만</div></div>' +
     '<div class="rm-sum-item"><div class="rm-sum-lbl">전체</div><div class="rm-sum-val">' + fmt(totalAmt) + '만</div></div>';
 
   // 물건별 그룹핑
@@ -1806,6 +1830,9 @@ function renderRentMgr() {
       });
     }
 
+    // 계약도 없고 공실도 없으면 스킵 (단, PROPS에 있는 물건은 빈 카드라도 표시)
+    if (!contracts.length && !vacantRows.length && !prop) { return; }
+    if (!contracts.length && !vacantRows.length) { vacantRows = prop ? ["(계약 없음)"] : []; }
     if (!contracts.length && !vacantRows.length) { return; }
 
     // 물건 납부 현황 집계
@@ -1820,14 +1847,27 @@ function renderRentMgr() {
 
     var card = document.createElement("div"); card.className = "rm-prop-card";
 
-    // 헤더
+    // 헤더 (탭하면 펼치기/접기)
     var hdr = document.createElement("div"); hdr.className = "rm-prop-hdr";
+    var hdrLeft = document.createElement("div"); hdrLeft.style.cssText="display:flex;align-items:center;gap:4px;";
     var title = document.createElement("div"); title.className = "rm-prop-title";
     title.textContent = (prop ? semoji(prop.type) + " " : "") + propName;
+    var arrow = document.createElement("span"); arrow.className = "rm-toggle-arrow"; arrow.textContent = "▾";
+    hdrLeft.appendChild(title); hdrLeft.appendChild(arrow);
     var stat = document.createElement("div"); stat.className = "rm-prop-stat " + statClass;
     stat.textContent = statLabel;
-    hdr.appendChild(title); hdr.appendChild(stat);
+    hdr.appendChild(hdrLeft); hdr.appendChild(stat);
     card.appendChild(hdr);
+
+    // 호실 목록 (기본: 접힘)
+    var body = document.createElement("div"); body.className = "rm-prop-body";
+    // 첫 번째 물건은 기본 펼침
+    if (listEl.children.length === 0) { body.classList.add("open"); arrow.textContent = "▴"; }
+
+    hdr.addEventListener("click", function() {
+      body.classList.toggle("open");
+      arrow.textContent = body.classList.contains("open") ? "▴" : "▾";
+    });
 
     // 세입자 행
     contracts.forEach(function(c) {
@@ -1837,8 +1877,12 @@ function renderRentMgr() {
       // 납부일
       var payDay = c.start ? new Date(c.start).getDate() : 1;
       var nameEl = document.createElement("div"); nameEl.className = "rm-tenant-name";
+      var ddayInfo = contractDday(c.end);
+      var ddayHtml = ddayInfo && ddayInfo.text !== "만료"
+        ? '<span style="font-size:10px;font-weight:600;margin-left:6px;color:' + ddayInfo.color + ';">' + ddayInfo.text + '</span>'
+        : (ddayInfo ? '<span style="font-size:10px;color:#AEAEB2;margin-left:6px;">만료</span>' : '');
       nameEl.innerHTML = (c.unit || c.tenant) +
-        '<span style="font-size:11px;color:#AEAEB2;margin-left:5px;">매월 ' + payDay + '일</span>';
+        '<span style="font-size:11px;color:#AEAEB2;margin-left:5px;">매월 ' + payDay + '일</span>' + ddayHtml;
 
       // 전화 링크
       if (c.phone) {
@@ -1880,12 +1924,30 @@ function renderRentMgr() {
         });
       })(c.id, amtEl);
 
-      // 납부 상태 버튼 (탭하면 순환)
+      // 납부 상태 버튼 (납부/미납/조기납부)
+      var btnWrap = document.createElement("div"); btnWrap.style.cssText="display:flex;gap:4px;";
       var payBtn = document.createElement("button");
       payBtn.className = "rm-pay-btn s-" + s;
-      payBtn.textContent = s==="paid"?"✓납부":s==="early"?"⚡조기":s==="prepaid"?"✓선납":s==="unpaid"?"✗미납":"공실";
+      payBtn.textContent = s==="paid"?"✓납부":s==="early"?"⚡조기":s==="prepaid"?"✓선납":s==="unpaid"?"✗미납":"미확인";
+      var earlyBtn = document.createElement("button");
+      earlyBtn.className = "rm-pay-btn s-early";
+      earlyBtn.style.cssText = "font-size:11px;padding:4px 8px;";
+      earlyBtn.textContent = "⚡조기";
+      btnWrap.appendChild(payBtn); btnWrap.appendChild(earlyBtn);
 
-      (function(cid, mk, btn, statEl, hdrStatEl) {
+      (function(cid, mk, btn, earlyBtn2, statEl, hdrStatEl) {
+        // 조기납부 버튼
+        earlyBtn2.addEventListener("click", function(e) {
+          e.stopPropagation();
+          for(var ci=0;ci<CONTRACTS.length;ci++){
+            if(CONTRACTS[ci].id!==cid){continue;}
+            if(!CONTRACTS[ci].payments){CONTRACTS[ci].payments={};}
+            CONTRACTS[ci].payments[mk]="early";
+            btn.className="rm-pay-btn s-early"; btn.textContent="⚡조기";
+            saveData(); renderContracts();
+            break;
+          }
+        });
         btn.addEventListener("click", function() {
           for (var ci=0; ci<CONTRACTS.length; ci++) {
             if (CONTRACTS[ci].id !== cid) { continue; }
@@ -1894,7 +1956,8 @@ function renderRentMgr() {
             var next = cur==="none"?"paid":cur==="paid"?"unpaid":cur==="unpaid"?"none":"paid";
             CONTRACTS[ci].payments[mk] = next;
             btn.className = "rm-pay-btn s-" + next;
-            btn.textContent = next==="paid"?"✓납부":next==="unpaid"?"✗미납":"공실";
+            btn.textContent = next==="paid"?"✓납부":next==="unpaid"?"✗미납":"미확인";
+            saveData(); renderContracts();
             saveData();
             // 물건 헤더 통계 업데이트
             var newPaid = 0;
@@ -1924,17 +1987,17 @@ function renderRentMgr() {
               else{cn2++;}
             });
             sumEl.innerHTML=
-              '<div class="rm-sum-item"><div class="rm-sum-lbl">납부완료 <span style="color:#1A7A40;font-weight:700;">'+cp2+'가구</span></div><div class="rm-sum-val" style="color:#1A7A40;">+'+fmt(tp)+'만</div></div>'+
-              '<div class="rm-sum-item"><div class="rm-sum-lbl">미납 <span style="color:#B91C1C;font-weight:700;">'+cu2+'가구</span></div><div class="rm-sum-val" style="color:#B91C1C;">'+(tu?"-"+fmt(tu):"–")+'만</div></div>'+
-              '<div class="rm-sum-item"><div class="rm-sum-lbl">공실 <span style="color:#AEAEB2;font-weight:700;">'+cn2+'가구</span></div><div class="rm-sum-val" style="color:#AEAEB2;">0만</div></div>'+
+              '<div class="rm-sum-item"><div class="rm-sum-lbl">납부 <span style="color:#1A7A40;font-weight:700;">'+cp2+'</span></div><div class="rm-sum-val" style="color:#1A7A40;">+'+fmt(tp)+'만</div></div>'+
+              '<div class="rm-sum-item"><div class="rm-sum-lbl">미납 <span style="color:#B91C1C;font-weight:700;">'+cu2+'</span></div><div class="rm-sum-val" style="color:#B91C1C;">'+(tu?"-"+fmt(tu):"–")+'만</div></div>'+
+              '<div class="rm-sum-item"><div class="rm-sum-lbl">미확인 <span style="color:#FF9500;font-weight:700;">'+cn2+'</span></div><div class="rm-sum-val" style="color:#FF9500;">?만</div></div>'+
               '<div class="rm-sum-item"><div class="rm-sum-lbl">전체</div><div class="rm-sum-val">'+fmt(totalAmt)+'만</div></div>';
             break;
           }
         });
-      })(c.id, monthKey, payBtn, stat, stat);
+      })(c.id, monthKey, payBtn, earlyBtn, stat, stat);
 
-      row.appendChild(nameEl); row.appendChild(amtEl); row.appendChild(payBtn);
-      card.appendChild(row);
+      row.appendChild(nameEl); row.appendChild(amtEl); row.appendChild(btnWrap);
+      body.appendChild(row);
     });
 
     // 공실 호실 행 추가
@@ -1945,15 +2008,21 @@ function renderRentMgr() {
       var amtEl = document.createElement("div"); amtEl.className = "rm-tenant-amt";
       amtEl.style.color = "#AEAEB2";
       amtEl.textContent = "0만";
+      var vacBtnWrap = document.createElement("div"); vacBtnWrap.style.cssText="display:flex;gap:4px;";
       var vacBtn = document.createElement("button");
       vacBtn.className = "rm-pay-btn s-none";
       vacBtn.textContent = "공실";
-      vacBtn.disabled = true;
-      vacBtn.style.opacity = "0.5";
-      row.appendChild(nameEl); row.appendChild(amtEl); row.appendChild(vacBtn);
-      card.appendChild(row);
+      vacBtn.disabled = true; vacBtn.style.opacity = "0.5";
+      var unkBtn = document.createElement("button");
+      unkBtn.className = "rm-pay-btn";
+      unkBtn.style.cssText = "background:#FFF4E0;color:#7A4D00;font-size:11px;padding:4px 8px;";
+      unkBtn.textContent = "미확인";
+      vacBtnWrap.appendChild(vacBtn); vacBtnWrap.appendChild(unkBtn);
+      row.appendChild(nameEl); row.appendChild(amtEl); row.appendChild(vacBtnWrap);
+      body.appendChild(row);
     });
 
+    card.appendChild(body);
     listEl.appendChild(card);
   });
 }
@@ -2120,13 +2189,36 @@ function openSheet(type, id) {
     loanRateDiv.appendChild(loanRateLbl); loanRateDiv.appendChild(inLoanRate);
     fc.appendChild(loanRateDiv);
 
-    fc.appendChild(makeFF("보증금 (만원)", inDep));
+    // 계약 기반 보증금·월세 합계 표시 (읽기 전용)
+    var propContracts = CONTRACTS.filter(function(c) {
+      if (c.propId !== (p.id || 0)) { return false; }
+      if (c.end && new Date(c.end) < new Date()) { return false; }
+      return true;
+    });
+    var contractDepSum = 0, contractRentSum = 0;
+    propContracts.forEach(function(c) {
+      contractDepSum += c.deposit || 0;
+      contractRentSum += c.monthly || 0;
+    });
 
-    // Rent label changes for multiroom
-    var rentLabel = curType === "다가구원룸" ? "방당 월세 (만원)" : "월세 (만원, 전세=0)";
-    var rentFF = makeFF(rentLabel, inRent);
-    rentFF.id = "ff-rent";
-    fc.appendChild(rentFF);
+    var depInfoDiv = document.createElement("div"); depInfoDiv.className = "ff";
+    depInfoDiv.style.background = "#F2F6FF";
+    var depInfoLbl = document.createElement("label"); depInfoLbl.textContent = "보증금 합계 (임대계약 기준)";
+    var depInfoVal = document.createElement("div");
+    depInfoVal.style.cssText = "font-size:16px;font-weight:700;color:#5856D6;padding:4px 0;";
+    depInfoVal.textContent = fmt(contractDepSum) + "만원" + (propContracts.length ? " (" + propContracts.length + "건)" : " (계약 없음)");
+    depInfoDiv.appendChild(depInfoLbl); depInfoDiv.appendChild(depInfoVal);
+    fc.appendChild(depInfoDiv);
+
+    var rentInfoDiv = document.createElement("div"); rentInfoDiv.className = "ff";
+    rentInfoDiv.style.background = "#F2FFF6";
+    var rentInfoLbl = document.createElement("label"); rentInfoLbl.textContent = "월세 합계 (임대계약 기준)";
+    var rentInfoVal = document.createElement("div");
+    rentInfoVal.style.cssText = "font-size:16px;font-weight:700;color:#1A7A40;padding:4px 0;";
+    rentInfoVal.textContent = fmt(contractRentSum) + "만원/월";
+    rentInfoDiv.appendChild(rentInfoLbl); rentInfoDiv.appendChild(rentInfoVal);
+    fc.appendChild(rentInfoDiv);
+
     fc.appendChild(makeFF("상태", selSt));
 
     // 호실 구성 섹션 (다가구원룸 전용)
@@ -2211,8 +2303,6 @@ function openSheet(type, id) {
     selType.addEventListener("change", function() {
       var isM = selType.value === "다가구원룸";
       ge("room-section").style.display = isM ? "" : "none";
-      var lbl = ge("ff-rent").querySelector("label");
-      if (lbl) { lbl.textContent = isM ? "방당 월세 (만원)" : "월세 (만원, 전세=0)"; }
     });
 
     // 구성 버튼 + 초기 그리드
@@ -2313,9 +2403,7 @@ function openSheet(type, id) {
               cell.classList.add("selected");
               var tuEl = ge("f-tu");
               if (tuEl) { tuEl.value = rl + " "; tuEl.focus(); }
-              var depEl = ge("f-cd"); var monEl = ge("f-cm");
-              if (depEl && !depEl.value) { depEl.value = prop2.deposit || ""; }
-              if (monEl && !monEl.value) { monEl.value = prop2.rent || ""; }
+              // 보증금·월세 자동입력 없음 - 사용자가 직접 입력
             });
           })(roomNum, roomLabel, prop);
         }
@@ -2338,11 +2426,8 @@ function openSheet(type, id) {
         } else {
           roomGridWrap.style.display = "none";
           // 일반 물건: 보증금·월세 자동 입력
-          if (selProp) {
-            var depEl = ge("f-cd"); var monEl = ge("f-cm");
-            if (depEl) { depEl.value = selProp.deposit || ""; }
-            if (monEl) { monEl.value = totalRent(selProp) || ""; }
-          }
+          // 자동입력 없음 - 사용자가 직접 입력
+          if (selProp) { /* 보증금·월세는 사용자가 직접 입력 */ }
         }
       }
       ppSel.addEventListener("change", onPropChange);
@@ -2386,8 +2471,9 @@ function saveProperty() {
     type: ptype,
     loc: ge("f-lc").value.trim() || "–",
     price: price,
-    deposit: parseFloat(ge("f-dp").value) || 0,
-    rent: parseFloat(ge("f-rt").value) || 0,
+    // 보증금·월세: 활성 임대계약 합산
+    deposit: (function(){ var s=0; CONTRACTS.forEach(function(c){ if(c.propId===sheetEditId && (!c.end||new Date(c.end)>=new Date())){ s+=c.deposit||0; } }); return s; })(),
+    rent: (function(){ var s=0; CONTRACTS.forEach(function(c){ if(c.propId===sheetEditId && (!c.end||new Date(c.end)>=new Date())){ s+=c.monthly||0; } }); return s; })(),
     status: ge("f-st").value,
     rooms: ptype === "다가구원룸" ? savedRooms : [],
     totalRooms: ptype === "다가구원룸" ? savedRooms.length : 0,
@@ -2410,7 +2496,7 @@ function saveProperty() {
 }
 
 function syncPropFromContracts(propId) {
-  // 해당 물건의 유효 계약(만료 안 된 것) 기준으로 보증금·월세·임대방 수 동기화
+  // 해당 물건의 유효 계약 기준으로 보증금·월세·임대방 수 자동 합산 동기화
   var prop = null;
   for (var pi = 0; pi < PROPS.length; pi++) { if (PROPS[pi].id === propId) { prop = PROPS[pi]; break; } }
   if (!prop) { return; }
@@ -2420,24 +2506,21 @@ function syncPropFromContracts(propId) {
     return new Date(c.end) >= new Date();
   });
   if (active.length === 0) {
-    // 계약 없으면 상태만 공실로
     prop.status = "공실";
+    if (isMultiRoom(prop)) { prop.rentedRooms = 0; }
     return;
   }
-  // 보증금·월세: 활성 계약들의 합산
+  // 전체 보증금·전체 월세: 활성 계약 합산
   var totalDep = 0, totalMon = 0;
   for (var ai = 0; ai < active.length; ai++) {
     totalDep += active[ai].deposit || 0;
     totalMon += active[ai].monthly || 0;
   }
-  prop.deposit = totalDep;
+  // 보증금·월세는 사용자가 직접 관리 (자동 덮어쓰기 안 함)
   if (isMultiRoom(prop)) {
-    // 다가구원룸: 임대방 수 = 활성 계약 수
     prop.rentedRooms = Math.min(active.length, prop.totalRooms || active.length);
-    prop.rent = active.length > 0 ? Math.round(totalMon / active.length) : 0;
     prop.status = prop.rentedRooms > 0 ? "임대중" : "공실";
   } else {
-    prop.rent = totalMon;
     prop.status = totalMon > 0 ? "임대중" : (totalDep > 0 ? "전세" : "공실");
   }
 }
