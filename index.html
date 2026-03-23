@@ -26,7 +26,7 @@ html,body{height:100%;background:#F2F2F7;font-family:-apple-system,BlinkMacSyste
 .ti-lb{font-size:13px;color:#8E8E93;}
 .ti.on .ti-ic{background:#007AFF;}
 .ti.on .ti-lb{color:#007AFF;font-weight:600;}
-.pnl{display:none;margin:0;padding:0;}.pnl.on{display:block;margin:0;padding:0;}#pnl-rentmgr.on{display:flex;flex-direction:column;}
+.pnl{display:none;margin:0;padding:0;}.pnl.on{display:block;margin:0;padding:0;}
 .sec{padding:20px 16px 6px;font-size:12px;font-weight:600;color:#6C6C70;text-transform:uppercase;letter-spacing:.05em;}
 .mstrip{display:flex;gap:10px;padding:0 16px;overflow-x:auto;margin-bottom:8px;}
 .mstrip::-webkit-scrollbar{display:none;}
@@ -447,7 +447,7 @@ html,body{height:100%;background:#F2F2F7;font-family:-apple-system,BlinkMacSyste
 
     <!-- 월세관리 탭 -->
     <div class="pnl" id="pnl-rentmgr">
-      <div id="rm-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(env(safe-area-inset-bottom,0px)+100px);min-height:0;"></div>
+      <div id="rm-list" style="padding-bottom:80px;"></div>
     </div>
 
   </div>
@@ -777,11 +777,11 @@ function goTab(id, pushHistory) {
   if (id === "cashflow") { renderCashflow(); }
   if (id === "annual") { renderAnnual(); }
   if (id === "rentmgr") {
-    // 카드 모두 접힘 상태로 렌더
     var rmList = ge("rm-list");
     if (rmList) {
       var openBodies = rmList.querySelectorAll(".rm-prop-body.open");
       for (var oi2=0; oi2<openBodies.length; oi2++) { openBodies[oi2].classList.remove("open"); }
+      rmList.scrollTop = 0;
     }
     renderRentMgr();
   }
@@ -1761,9 +1761,25 @@ function renderRentMgr() {
   var MONTHS_KR = ["1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월"];
   var now = new Date();
 
-  // 항상 맨 위로 스크롤
+  // rm-list 높이를 화면에 맞게 계산
   var sc = ge("scroll"); if (sc) { sc.scrollTop = 0; }
-  var rl = ge("rm-list"); if (rl) { rl.scrollTop = 0; }
+  setTimeout(function() {
+    var appEl = document.getElementById("app");
+    var hdrEl = document.getElementById("hdr");
+    var barEl = document.getElementById("rm-fixed-bar");
+    var tabEl = document.getElementById("tabbar");
+    var listEl2 = document.getElementById("rm-list");
+    if (appEl && hdrEl && tabEl && listEl2) {
+      var totalH = appEl.offsetHeight;
+      var hdrH = hdrEl.offsetHeight;
+      var barH = barEl ? barEl.offsetHeight : 0;
+      var tabH = tabEl.offsetHeight;
+      var listH = totalH - hdrH - barH - tabH;
+      listEl2.style.height = listH + "px";
+      listEl2.style.overflowY = "auto";
+      listEl2.style.webkitOverflowScrolling = "touch";
+    }
+  }, 50);
 
   // 월 네비게이션
   var nav = ge("rm-month-nav");
