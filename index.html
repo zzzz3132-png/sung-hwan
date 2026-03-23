@@ -766,6 +766,13 @@ function goTab(id, pushHistory) {
     } else {
       scrollEl.classList.remove("rm-mode");
       scrollEl.scrollTop = 0;
+      // rm-list fixed 해제
+      var rl = ge("rm-list");
+      if (rl) {
+        rl.style.position = "";
+        rl.style.top = ""; rl.style.left = "";
+        rl.style.right = ""; rl.style.bottom = "";
+      }
     }
   }
   ge("ptitle").textContent = TAB_TITLES[id] || id;
@@ -1770,26 +1777,30 @@ function renderRentMgr() {
 
   // rm-list 높이를 화면에 맞게 계산
   var sc = ge("scroll"); if (sc) { sc.scrollTop = 0; }
-  // rm-list 높이를 화면에 맞게 직접 계산
-  function calcRmListHeight() {
-    var appEl = document.getElementById("app");
+  // rm-list를 position:fixed로 정확하게 배치
+  function positionRmList() {
     var hdrEl = document.getElementById("hdr");
     var barEl = document.getElementById("rm-fixed-bar");
     var tabEl = document.getElementById("tabbar");
     var listEl2 = document.getElementById("rm-list");
-    if (!appEl || !hdrEl || !tabEl || !listEl2) { return; }
-    var totalH = appEl.offsetHeight;
-    var hdrH = hdrEl.offsetHeight;
-    var barH = barEl ? barEl.offsetHeight : 0;
-    var tabH = tabEl.offsetHeight;
-    var listH = totalH - hdrH - barH - tabH;
-    listEl2.style.height = listH + "px";
+    if (!hdrEl || !tabEl || !listEl2) { return; }
+    var hdrBottom = hdrEl.getBoundingClientRect().bottom;
+    var barBottom = barEl ? barEl.getBoundingClientRect().bottom : hdrBottom;
+    var tabTop = tabEl.getBoundingClientRect().top;
+    listEl2.style.position = "fixed";
+    listEl2.style.top = barBottom + "px";
+    listEl2.style.left = "0";
+    listEl2.style.right = "0";
+    listEl2.style.bottom = (window.innerHeight - tabTop) + "px";
     listEl2.style.overflowY = "auto";
     listEl2.style.webkitOverflowScrolling = "touch";
-    listEl2.style.paddingBottom = "80px";
+    listEl2.style.paddingBottom = "20px";
+    listEl2.style.maxWidth = "430px";
+    listEl2.style.margin = "0 auto";
+    listEl2.style.zIndex = "10";
   }
-  calcRmListHeight();
-  setTimeout(calcRmListHeight, 100);
+  positionRmList();
+  setTimeout(positionRmList, 100);
 
   // 월 네비게이션
   var nav = ge("rm-month-nav");
