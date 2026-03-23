@@ -17,7 +17,7 @@ html,body{height:100%;background:#F2F2F7;font-family:-apple-system,BlinkMacSyste
 #btn-add{width:30px;height:30px;border-radius:50%;background:#E5F0FF;border:none;color:#007AFF;font-size:22px;line-height:1;cursor:pointer;display:none;align-items:center;justify-content:center;}
 #btn-back{display:none;align-items:center;gap:3px;background:transparent;border:none;color:#007AFF;font-size:15px;font-weight:500;cursor:pointer;padding:0;min-width:60px;}
 #btn-back svg{width:10px;height:16px;flex-shrink:0;}
-#scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 140px);}#scroll.rm-mode{overflow-y:hidden;padding:0;}
+#scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 140px);}
 #scroll::-webkit-scrollbar{display:none;}
 #tabbar{background:#fff;border-top:0.5px solid rgba(0,0,0,.15);display:flex;align-items:flex-start;padding-top:6px;padding-bottom:env(safe-area-inset-bottom,0px);flex-shrink:0;position:sticky;bottom:0;z-index:100;}
 #tabbar::-webkit-scrollbar{display:none;}
@@ -447,7 +447,7 @@ html,body{height:100%;background:#F2F2F7;font-family:-apple-system,BlinkMacSyste
 
     <!-- 월세관리 탭 -->
     <div class="pnl" id="pnl-rentmgr">
-      <div id="rm-list" style="padding-bottom:100px;"></div>
+      <div id="rm-list"></div>
     </div>
 
   </div>
@@ -755,27 +755,11 @@ function goTab(id, pushHistory) {
   var panels = document.querySelectorAll(".pnl");
   for (var j = 0; j < panels.length; j++) { panels[j].classList.remove("on"); }
   ge("pnl-" + id).classList.add("on");
-  // rentmgr 고정 바 표시/숨김
+  // 고정 바 표시/숨김
   var rmBar = ge("rm-fixed-bar");
   if (rmBar) { rmBar.style.display = (id === "rentmgr") ? "block" : "none"; }
-  // rentmgr 전용 스크롤 모드
   var scrollEl = ge("scroll");
-  if (scrollEl) {
-    if (id === "rentmgr") {
-      scrollEl.classList.add("rm-mode");
-    } else {
-      scrollEl.classList.remove("rm-mode");
-      scrollEl.scrollTop = 0;
-      var rl2 = ge("rm-list");
-      if (rl2) {
-        rl2.style.position = "";
-        rl2.style.top = ""; rl2.style.left = ""; rl2.style.right = "";
-        rl2.style.bottom = ""; rl2.style.transform = "";
-        rl2.style.width = ""; rl2.style.overflowY = "";
-      }
-
-    }
-  }
+  if (scrollEl) { scrollEl.scrollTop = 0; }
   ge("ptitle").textContent = TAB_TITLES[id] || id;
   curTab = id;
   pendingDel = null;
@@ -1778,30 +1762,6 @@ function renderRentMgr() {
 
   // rm-list 높이를 화면에 맞게 계산
   var sc = ge("scroll"); if (sc) { sc.scrollTop = 0; }
-  // rm-list를 position:fixed로 배치, 내부 스크롤 활성화
-  function positionRmList() {
-    var barEl = document.getElementById("rm-fixed-bar");
-    var tabEl = document.getElementById("tabbar");
-    var listEl2 = document.getElementById("rm-list");
-    if (!tabEl || !listEl2) { return; }
-    var barBottom = barEl ? barEl.getBoundingClientRect().bottom : 0;
-    var tabTop = tabEl.getBoundingClientRect().top;
-    listEl2.style.position = "fixed";
-    listEl2.style.top = Math.round(barBottom) + "px";
-    listEl2.style.bottom = Math.round(window.innerHeight - tabTop) + "px";
-    listEl2.style.left = "50%";
-    listEl2.style.transform = "translateX(-50%)";
-    listEl2.style.width = "100%";
-    listEl2.style.maxWidth = "430px";
-    listEl2.style.overflowY = "scroll";
-    listEl2.style.webkitOverflowScrolling = "touch";
-    listEl2.style.paddingBottom = "20px";
-    listEl2.style.zIndex = "10";
-    listEl2.style.background = "#F2F2F7";
-    listEl2.scrollTop = 0;
-  }
-  positionRmList();
-  setTimeout(positionRmList, 80);
 
   // 월 네비게이션
   var nav = ge("rm-month-nav");
