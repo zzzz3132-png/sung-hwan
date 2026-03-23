@@ -17,7 +17,7 @@ html,body{height:100%;background:#F2F2F7;font-family:-apple-system,BlinkMacSyste
 #btn-add{width:30px;height:30px;border-radius:50%;background:#E5F0FF;border:none;color:#007AFF;font-size:22px;line-height:1;cursor:pointer;display:none;align-items:center;justify-content:center;}
 #btn-back{display:none;align-items:center;gap:3px;background:transparent;border:none;color:#007AFF;font-size:15px;font-weight:500;cursor:pointer;padding:0;min-width:60px;}
 #btn-back svg{width:10px;height:16px;flex-shrink:0;}
-#scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 140px);}
+#scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 140px);display:flex;flex-direction:column;}
 #scroll::-webkit-scrollbar{display:none;}
 #tabbar{background:#fff;border-top:0.5px solid rgba(0,0,0,.15);display:flex;align-items:flex-start;padding-top:6px;padding-bottom:env(safe-area-inset-bottom,0px);flex-shrink:0;position:sticky;bottom:0;z-index:100;}
 #tabbar::-webkit-scrollbar{display:none;}
@@ -26,7 +26,7 @@ html,body{height:100%;background:#F2F2F7;font-family:-apple-system,BlinkMacSyste
 .ti-lb{font-size:13px;color:#8E8E93;}
 .ti.on .ti-ic{background:#007AFF;}
 .ti.on .ti-lb{color:#007AFF;font-weight:600;}
-.pnl{display:none;}.pnl.on{display:block;}
+.pnl{display:none;}.pnl.on{display:block;flex:1;}#pnl-rentmgr.on{display:flex;flex:1;}
 .sec{padding:20px 16px 6px;font-size:12px;font-weight:600;color:#6C6C70;text-transform:uppercase;letter-spacing:.05em;}
 .mstrip{display:flex;gap:10px;padding:0 16px;overflow-x:auto;margin-bottom:8px;}
 .mstrip::-webkit-scrollbar{display:none;}
@@ -171,10 +171,10 @@ html,body{height:100%;background:#F2F2F7;font-family:-apple-system,BlinkMacSyste
 .rm-pay-btn.s-early{background:#E5F0FF;color:#0055CC;}
 .rm-pay-btn.s-prepaid{background:#E8F8EF;color:#1A7A40;}
 .rm-pay-btn.s-unpaid{background:#FFEBEA;color:#B91C1C;}
-.rm-month-nav{display:flex;align-items:center;justify-content:space-between;padding:8px 16px;background:#fff;position:sticky;top:0;z-index:50;border-bottom:0.5px solid rgba(0,0,0,.08);}
+.rm-month-nav{display:flex;align-items:center;justify-content:space-between;padding:8px 16px;background:#fff;border-bottom:0.5px solid rgba(0,0,0,.08);}
 .rm-month-label{font-size:15px;font-weight:700;color:#007AFF;}
 .rm-nav-btn{background:transparent;border:0.5px solid rgba(0,122,255,.4);border-radius:8px;padding:4px 12px;font-size:13px;color:#007AFF;cursor:pointer;}
-.rm-summary-bar{display:flex;gap:0;padding:8px 16px;margin:0;background:#F8F8F8;position:sticky;top:44px;z-index:49;border-bottom:0.5px solid rgba(0,0,0,.06);}
+.rm-summary-bar{display:flex;gap:0;padding:8px 16px;margin:0;background:#F8F8F8;border-bottom:0.5px solid rgba(0,0,0,.06);}
 .rm-sum-item{flex:1;text-align:center;}
 .rm-sum-lbl{font-size:10px;color:#8E8E93;margin-bottom:2px;}
 .rm-sum-val{font-size:15px;font-weight:700;}
@@ -440,10 +440,10 @@ html,body{height:100%;background:#F2F2F7;font-family:-apple-system,BlinkMacSyste
   </div>
 
     <!-- 월세관리 탭 -->
-    <div class="pnl" id="pnl-rentmgr">
-      <div id="rm-month-nav" class="rm-month-nav"></div>
-      <div id="rm-summary" class="rm-summary-bar"></div>
-      <div id="rm-list" style="padding-bottom:160px;"></div>
+    <div class="pnl" id="pnl-rentmgr" style="display:none;flex-direction:column;height:100%;">
+      <div id="rm-month-nav" class="rm-month-nav" style="flex-shrink:0;"></div>
+      <div id="rm-summary" class="rm-summary-bar" style="flex-shrink:0;"></div>
+      <div id="rm-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:160px;"></div>
     </div>
 
   </div>
@@ -769,7 +769,15 @@ function goTab(id, pushHistory) {
   if (id === "contract") { renderContracts(); }
   if (id === "cashflow") { renderCashflow(); }
   if (id === "annual") { renderAnnual(); }
-  if (id === "rentmgr") { renderRentMgr(); }
+  if (id === "rentmgr") {
+    // 카드 모두 접힘 상태로 렌더
+    var rmList = ge("rm-list");
+    if (rmList) {
+      var openBodies = rmList.querySelectorAll(".rm-prop-body.open");
+      for (var oi2=0; oi2<openBodies.length; oi2++) { openBodies[oi2].classList.remove("open"); }
+    }
+    renderRentMgr();
+  }
 }
 
 function goBack() {
@@ -1220,6 +1228,17 @@ function renderContracts() {
         detailOpen = !detailOpen;
         detail.style.display = detailOpen ? "block" : "none";
         histBtn.textContent = detailOpen ? "내역 ▴" : "내역 ▾";
+        // 납부 내역 자동 펼침
+        if (detailOpen) {
+          setTimeout(function() {
+            var hBox = detail.querySelector(".pay-hist-box");
+            var ht = detail.querySelector(".pay-hist-label");
+            if (hBox && hBox.style.display === "none") {
+              hBox.style.display = "block";
+              if (ht) { ht.textContent = "납부 내역 접기 ▴"; }
+            }
+          }, 10);
+        }
       });
 
       // ── 납부 히스토리 (정기/지연/미납 구분) ───────────────────
@@ -1239,9 +1258,10 @@ function renderContracts() {
 
         // 납부 내역 보기 토글
         var histToggle = document.createElement("div");
+        histToggle.className = "pay-hist-label";
         histToggle.style.cssText = "padding:8px 16px;font-size:12px;color:#007AFF;cursor:pointer;font-weight:600;border-top:0.5px solid rgba(0,0,0,.06);text-align:right;";
         histToggle.textContent = "납부 내역 보기 ▾";
-        var histBox = document.createElement("div"); histBox.style.display = "none";
+        var histBox = document.createElement("div"); histBox.className = "pay-hist-box"; histBox.style.display = "none";
         var histOpen = false;
         histToggle.addEventListener("click", function(e) {
           e.stopPropagation();
@@ -1734,7 +1754,7 @@ function renderRentMgr() {
   var MONTHS_KR = ["1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월"];
   var now = new Date();
 
-  // 항상 맨 위로 스크롤
+  // 항상 맨 위로 스크롤, 모든 카드 접힘 상태로 리셋
   var sc = ge("scroll"); if (sc) { sc.scrollTop = 0; }
 
   // 월 네비게이션
