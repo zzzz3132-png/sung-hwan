@@ -18,10 +18,9 @@ html,body{height:100%;background:#F2F2F7;font-family:-apple-system,BlinkMacSyste
 #btn-back{display:none;align-items:center;gap:3px;background:transparent;border:none;color:#007AFF;font-size:15px;font-weight:500;cursor:pointer;padding:0;min-width:60px;}
 #btn-back svg{width:10px;height:16px;flex-shrink:0;}
 #scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 140px);}
-#scroll.rm-mode{overflow:hidden;display:flex;flex-direction:column;padding:0;}
 #scroll::-webkit-scrollbar{display:none;}
-#pnl-rentmgr.on{display:flex!important;flex-direction:column;flex:1;min-height:0;}
-#rm-list{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0;padding-bottom:120px;}
+#pnl-rentmgr{position:fixed;left:0;right:0;overflow-y:auto;-webkit-overflow-scrolling:touch;display:none;background:#F2F2F7;z-index:10;}
+#pnl-rentmgr.on{display:block;}
 #tabbar{background:#fff;border-top:0.5px solid rgba(0,0,0,.15);display:flex;align-items:flex-start;padding-top:6px;padding-bottom:env(safe-area-inset-bottom,0px);flex-shrink:0;position:sticky;bottom:0;z-index:100;}
 #tabbar::-webkit-scrollbar{display:none;}
 .ti{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:2px 4px 8px;min-width:0;}
@@ -29,7 +28,7 @@ html,body{height:100%;background:#F2F2F7;font-family:-apple-system,BlinkMacSyste
 .ti-lb{font-size:13px;color:#8E8E93;}
 .ti.on .ti-ic{background:#007AFF;}
 .ti.on .ti-lb{color:#007AFF;font-weight:600;}
-.pnl{display:none;margin:0;padding:0;}.pnl.on{display:block;margin:0;padding:0;min-height:0;}
+.pnl{display:none;margin:0;padding:0;}.pnl.on{display:block;margin:0;padding:0;}
 .sec{padding:20px 16px 6px;font-size:12px;font-weight:600;color:#6C6C70;text-transform:uppercase;letter-spacing:.05em;}
 .mstrip{display:flex;gap:10px;padding:0 16px;overflow-x:auto;margin-bottom:8px;}
 .mstrip::-webkit-scrollbar{display:none;}
@@ -450,7 +449,7 @@ html,body{height:100%;background:#F2F2F7;font-family:-apple-system,BlinkMacSyste
 
     <!-- 월세관리 탭 -->
     <div class="pnl" id="pnl-rentmgr">
-      <div id="rm-list"></div>
+      <div id="rm-list" style="padding-bottom:80px;"></div>
     </div>
 
   </div>
@@ -763,14 +762,21 @@ function goTab(id, pushHistory) {
   if (rmBar) { rmBar.style.display = (id === "rentmgr") ? "block" : "none"; }
   var scrollEl = ge("scroll");
   if (scrollEl) {
-    if (id === "rentmgr") {
-      scrollEl.classList.add("rm-mode");
-      scrollEl.style.paddingBottom = "";
-    } else {
-      scrollEl.classList.remove("rm-mode");
-      scrollEl.style.paddingBottom = "";
-      scrollEl.scrollTop = 0;
-    }
+    if (id !== "rentmgr") { scrollEl.scrollTop = 0; }
+  }
+  // pnl-rentmgr 위치 설정
+  if (id === "rentmgr") {
+    setTimeout(function() {
+      var bar = ge("rm-fixed-bar");
+      var tab = ge("tabbar");
+      var pnl = ge("pnl-rentmgr");
+      if (bar && tab && pnl) {
+        var top = bar.getBoundingClientRect().bottom;
+        var bottom = window.innerHeight - tab.getBoundingClientRect().top;
+        pnl.style.top = top + "px";
+        pnl.style.bottom = bottom + "px";
+      }
+    }, 10);
   }
   ge("ptitle").textContent = TAB_TITLES[id] || id;
   curTab = id;
@@ -1773,9 +1779,18 @@ function renderRentMgr() {
   var now = new Date();
 
   // rm-list 높이를 화면에 맞게 계산
-  // rm-list 스크롤 상단으로
-  var rl0 = ge("rm-list");
-  if (rl0) { rl0.scrollTop = 0; }
+  // 패널 스크롤 상단으로
+  var pnlRm = ge("pnl-rentmgr");
+  if (pnlRm) { pnlRm.scrollTop = 0; }
+  // 위치 재계산
+  var bar2 = ge("rm-fixed-bar");
+  var tab2 = ge("tabbar");
+  if (bar2 && tab2 && pnlRm) {
+    var t2 = bar2.getBoundingClientRect().bottom;
+    var b2 = window.innerHeight - tab2.getBoundingClientRect().top;
+    pnlRm.style.top = t2 + "px";
+    pnlRm.style.bottom = b2 + "px";
+  }
 
   // 월 네비게이션
   var nav = ge("rm-month-nav");
