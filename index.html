@@ -310,7 +310,7 @@ html,body{height:100%;background:#F2F2F7;font-family:-apple-system,BlinkMacSyste
   </div>
 
   <!-- 월세관리 고정 바: hdr 아래, scroll 위 -->
-  <div id="rm-fixed-bar" style="display:none;">
+  <div id="rm-fixed-bar" style="display:none;position:fixed;left:0;right:0;z-index:20;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.08);">
     <div id="rm-month-nav" class="rm-month-nav"></div>
     <div id="rm-summary" class="rm-summary-bar"></div>
   </div>
@@ -1172,9 +1172,8 @@ function renderContracts() {
     hdr.appendChild(hdrLeft); hdr.appendChild(hdrRight);
     card.appendChild(hdr);
 
-    // 호실 목록 (첫 번째 물건 기본 펼침)
+    // 호실 목록 (기본 접힘)
     var body = document.createElement("div"); body.className = "ct-body";
-    if (pidx === 0) { body.classList.add("open"); }
     hdr.addEventListener("click", function() {
       body.classList.toggle("open");
       arrowEl.textContent = body.classList.contains("open") ? "▴" : "▾";
