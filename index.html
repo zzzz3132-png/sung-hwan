@@ -515,8 +515,21 @@ function propRooms(p) {
 }
 function totalRooms(p) { return propRooms(p).length; }
 function totalRent(p) {
-  if (isMultiRoom(p)) { return (p.rent || 0) * (p.rentedRooms || 0); }
-  return p.rent || 0;
+  // 임대계약 기반 월세 합산 (만료 안 된 계약)
+  var sum = 0;
+  var now = new Date();
+  for (var i = 0; i < CONTRACTS.length; i++) {
+    var c = CONTRACTS[i];
+    if (c.propId !== p.id) { continue; }
+    if (c.end && new Date(c.end) < now) { continue; }
+    sum += c.monthly || 0;
+  }
+  // 계약이 없으면 p.rent 기준으로 fallback
+  if (sum === 0) {
+    if (isMultiRoom(p)) { return (p.rent || 0) * (p.rentedRooms || 0); }
+    return p.rent || 0;
+  }
+  return sum;
 }
 function pyld(p) {
   var mr = totalRent(p);
